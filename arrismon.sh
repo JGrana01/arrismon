@@ -812,9 +812,6 @@ awk -F, '{printf("%d,%d,%d,TxChannelID,%d,SymRate,%d,TxFreq,%d,TxPwr,%d\n", $1, 
 
 cat "$shstatsfile_ust" "$shstatsfile_dst" | sed 's%Ksym/sec%%' | sed 's/dBmV//' | sed 's/dB//' | sed 's/Hz//' | sed 's/ //g' > "$shstatsfile"
 
-#rm -f "$shstatsfile_curl"
-#rm -f "$shstatsfile_dst"
-#rm -f "$shstatsfile_ust"
 
 if [ "$debug" = "true" ]; then
 echo "UST is"
@@ -829,6 +826,9 @@ echo
 echo "Processsed"
 read a
 fi
+rm -f "$shstatsfile_curl"
+rm -f "$shstatsfile_dst"
+rm -f "$shstatsfile_ust"
 
 
 if [ "$debug" = "true" ]; then
@@ -1127,6 +1127,9 @@ Generate_Modem_Logs(){
 		sed 's///g' "$shstatsfile_logtbl" | strings | grep $i | sed 's%</td><td width="87">%%g' | sed 's%<td width="169">%%g' | sed 's%</td><td width="450">%,%g' | sed 's%</td>%%g' >> "$shstatsfile_logtmp"
 	done
 
+# annoyningly Arris doesn't timestamp each log messages. They are clustered and Im still trying to figure out how to deal with this
+# so, I simply (and wrongly) use the present system time...
+
 	logtime="$(date)"
 	while IFS=  read -r line
 	do
@@ -1135,14 +1138,9 @@ Generate_Modem_Logs(){
 		echo "$logtime,$logprio,$logmessage" >> /tmp/modlogs.csv
 	done < "$shstatsfile_logtmp"
 
-if [ "$debug" = "true" ]; then
-	cat /tmp/modlogs.csv
-	read a
-fi
-	
 	mv /tmp/modlogs.csv "$SCRIPT_STORAGE_DIR/modlogs.csv"
-#	rm -f "$shstatsfile_logtbl"
-#	rm -f "$shstatsfile_logtmp"
+	rm -f "$shstatsfile_logtbl"
+	rm -f "$shstatsfile_logtmp"
 }
 
 Reset_DB(){
