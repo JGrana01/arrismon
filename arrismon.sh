@@ -1118,6 +1118,7 @@ Generate_Modem_Logs(){
 		loglist="Critical Error Notice"
 	else
 		loglist="Critical Error"
+	fi
 
 	for i in $loglist ; do
 		sed 's///g' "$shstatsfile_logtbl" | strings | grep $i | sed 's%</td><td width="87">%%g' | sed 's%<td width="169">%%g' | sed 's%</td><td width="450">%,%g' | sed 's%</td>%%g' >> "$shstatsfile_logtmp"
@@ -1648,7 +1649,7 @@ if [ -z "$1" ]; then
 	NTP_Ready
 	Entware_Ready
 #debug mode, remove
-#	Clear_Lock
+	Clear_Lock
 	Create_Dirs
 	Conf_Exists
 	ScriptStorageLocation load
