@@ -352,7 +352,7 @@ Conf_Exists(){
 		fi
 		return 0
 	else
-		{ echo "OUTPUTDATAMODE=average"; echo "OUTPUTTIMEMODE=unix"; echo "STORAGELOCATION=jffs"; echo "FIXTXPWR=false"; echo "DAYSTOKEEP=30"; } > "$SCRIPT_CONF"
+		{ echo "OUTPUTDATAMODE=average"; echo "OUTPUTTIMEMODE=unix"; echo "STORAGELOCATION=jffs"; echo "SHOWNOTICE=false"; echo "DAYSTOKEEP=30"; } > "$SCRIPT_CONF"
 		return 1
 	fi
 }
@@ -632,19 +632,19 @@ OutputTimeMode(){
 	esac
 }
 
-FixTxPwr(){
+ShowNotice(){
 	case "$1" in
 		true)
-			sed -i 's/^FIXTXPWR.*$/FIXTXPWR=true/' "$SCRIPT_CONF"
+			sed -i 's/^SHOWNOTICE.*$/SHOWNOTICE=true/' "$SCRIPT_CONF"
 			Generate_CSVs
 		;;
 		false)
-			sed -i 's/^FIXTXPWR.*$/FIXTXPWR=false/' "$SCRIPT_CONF"
+			sed -i 's/^SHOWNOTICE.*$/SHOWNOTICE=false/' "$SCRIPT_CONF"
 			Generate_CSVs
 		;;
 		check)
-			FIXTXPWR=$(grep "FIXTXPWR" "$SCRIPT_CONF" | cut -f2 -d"=")
-			echo "$FIXTXPWR"
+			SHOWNOTICE=$(grep "SHOWNOTICE" "$SCRIPT_CONF" | cut -f2 -d"=")
+			echo "$SHOWNOTICE"
 		;;
 	esac
 }
@@ -715,7 +715,7 @@ WriteSql_ToFile(){
 		dividefactor=10
 	fi
 	
-	if echo "$2" | grep -qF "TxPwr" && [ "$(FixTxPwr "check")" = "true" ]; then
+	if echo "$2" | grep -qF "TxPwr" ; then
 		dividefactor=10
 	fi
 	
@@ -974,7 +974,7 @@ Generate_CSVs(){
 			dividefactor=10
 		fi
 		
-		if echo "$metric" | grep -qF "TxPwr" && [ "$(FixTxPwr "check")" = "true" ]; then
+		if echo "$metric" | grep -qF "TxPwr" ; then
 			dividefactor=10
 		fi
 
@@ -1110,11 +1110,19 @@ Generate_Modem_Logs(){
 
 	shstatsfile_logtbl="/tmp/shstats_logtbl.csv"
 	shstatsfile_logtmp="/tmp/shstats_logtmp.csv"
+	rm -f "$shstatsfile_logtmp"
 
 	/usr/sbin/curl -fs --retry 3 --connect-timeout 15 'http://192.168.100.1/RgEventLog.asp' -H 'User-Agent: Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:98.0) Gecko/20100101 Firefox/98.0' -H 'Accept: */*' -H 'X-CSRF-TOKEN: 7d298d27f7ede0df78c9292cdca2cd57' -H 'X-Requested-With: XMLHttpRequest' -H 'Connection: keep-alive' -H 'Cookie: lang=fr; PHPSESSID=9csugaomqu52rqc6vgul600b91; auth=7d298d27f7ede0df78c9292cdca2cd57' > "$shstatsfile_logtbl"
 
-	sed 's///g' "$shstatsfile_logtbl" | strings | grep Notice | sed 's%</td><td width="87">%%g' | sed 's%</td><td width="450">%,%g' | sed 's%</td>%%g' > "$shstatsfile_logtmp"
-	sed 's///g' "$shstatsfile_logtbl" | strings | grep Critical | sed 's%</td><td width="87">%%g' | sed 's%<td width="169">%%g' | sed 's%</td><td width="450">%,%g' | sed 's%</td>%%g' > "$shstatsfile_logtmp"
+	if [ "$SHOWNOTICE" = "true" ]; then
+		loglist="Critical Error Notice"
+	else
+		loglist="Critical Error"
+
+	for i in $loglist ; do
+		sed 's///g' "$shstatsfile_logtbl" | strings | grep $i | sed 's%</td><td width="87">%%g' | sed 's%<td width="169">%%g' | sed 's%</td><td width="450">%,%g' | sed 's%</td>%%g' >> "$shstatsfile_logtmp"
+#		sed 's///g' "$shstatsfile_logtbl" | strings | grep Critical | sed 's%</td><td width="87">%%g' | sed 's%<td width="169">%%g' | sed 's%</td><td width="450">%,%g' | sed 's%</td>%%g' > "$shstatsfile_logtmp"
+	done
 
 	logtime="$(date)"
 	while IFS=  read -r line
@@ -1130,8 +1138,8 @@ if [ "$debug" = "true" ]; then
 fi
 	
 	mv /tmp/modlogs.csv "$SCRIPT_STORAGE_DIR/modlogs.csv"
-	rm -f "$shstatsfile_logtbl"
-	rm -f "$shstatsfile_logtmp"
+#	rm -f "$shstatsfile_logtbl"
+#	rm -f "$shstatsfile_logtmp"
 }
 
 Reset_DB(){
@@ -1226,19 +1234,13 @@ ScriptHeader(){
 }
 
 MainMenu(){
-	FIXTXPWR_MENU=""
-	if [ "$(FixTxPwr check)" = "true" ]; then
-		FIXTXPWR_MENU="Enabled"
-	else
-		FIXTXPWR_MENU="Disabled"
-	fi
 	printf "WebUI for %s Arris is available at:\\n${SETTING}%s${CLEARFORMAT}\\n\\n" "$SCRIPT_NAME" "$(Get_WebUI_URL)"
 	printf "1.    Check stats now\\n\\n"
 	printf "2.    Toggle data output mode\\n      Currently ${SETTING}%s${CLEARFORMAT} values will be used for weekly and monthly charts\\n\\n" "$(OutputDataMode check)"
 	printf "3.    Toggle time output mode\\n      Currently ${SETTING}%s${CLEARFORMAT} time values will be used for CSV exports\\n\\n" "$(OutputTimeMode check)"
 	printf "4.    Set number of days data to keep in database\\n      Currently: ${SETTING}%s days data will be kept${CLEARFORMAT}\\n\\n" "$(DaysToKeep check)"
 	printf "s.    Toggle storage location for stats and config\\n      Current location is ${SETTING}%s${CLEARFORMAT} \\n\\n" "$(ScriptStorageLocation check)"
-#	printf "f.    Fix Upstream Power level reporting (reduce by 10x, needed in newer Hub 3 firmware)\\n      Currently: ${SETTING}%s${CLEARFORMAT} \\n\\n" "$FIXTXPWR_MENU"
+#	printf "n.    Show Notice messages from modem logs (Critical and Error always shown)
 	printf "u.    Check for updates\\n"
 	printf "uf.   Update %s with latest version (force update)\\n\\n" "$SCRIPT_NAME"
 	printf "r.    Reset %s database / delete all data\\n\\n" "$SCRIPT_NAME"
@@ -1327,6 +1329,11 @@ MainMenu(){
 				ScriptHeader
 				printf "\\n${BOLD}Thanks for using %s!${CLEARFORMAT}\\n\\n\\n" "$SCRIPT_NAME"
 				exit 0
+			;;
+			n)
+				printf "\\n"
+				ShowNotice
+				break
 			;;
 			z)
 				while true; do
