@@ -1,9 +1,9 @@
 # arrismon
-Asuswrt-Merlin Addon for Arris SB61XX Modems
+Asuswrt-Merlin Addon for Arris SURFboard SB61XX Modems
 
 ## About
 arrismon is a tool that tracks your cable modem's stats (such as signal power levels) for AsusWRT Merlin with charts for daily, weekly and monthly summaries. 
-It is mostly identical to modmon created by JackYaz. However, arrismon is customized for another series of modems, the Arris SB61XX line.
+It is mostly identical to modmon created by JackYaz. However, arrismon is customized for another series of modems, the Arris SURFboard SB61XX line.
 It likely wont work with the newer DOCSIS 3.1 modems (i.e. SB8200 series). Im sure it can be adapted but I don't have access to one to parse it's html logs.
 
 Compared to the version of Jack, it queries the modem every 15 minutes.
