@@ -646,6 +646,16 @@ ShowNotice(){
 			SHOWNOTICE=$(grep "SHOWNOTICE" "$SCRIPT_CONF" | cut -f2 -d"=")
 			echo "$SHOWNOTICE"
 		;;
+		toggle)
+			SHOWNOTICE=$(grep "SHOWNOTICE" "$SCRIPT_CONF" | cut -f2 -d"=")
+			if [ "$SHOWNOTICE" = "false" ]; then
+				sed -i 's/^SHOWNOTICE.*$/SHOWNOTICE=true/' "$SCRIPT_CONF"
+                        	Generate_CSVs
+			else
+                        	sed -i 's/^SHOWNOTICE.*$/SHOWNOTICE=false/' "$SCRIPT_CONF"
+                        	Generate_CSVs
+			fi
+		;;
 	esac
 }
 
@@ -1329,7 +1339,7 @@ MainMenu(){
 			;;
 			n)
 				printf "\\n"
-				ShowNotice
+				ShowNotice toggle
 				break
 			;;
 			e)
