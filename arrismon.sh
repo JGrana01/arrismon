@@ -721,17 +721,17 @@ WriteSql_ToFile(){
 	} > "$7"
 	
 	dividefactor=1
-	if echo "$2" | grep -qF "RxPwr" || echo "$2" | grep -qF "RxSnr" ; then
-		dividefactor=10
-	fi
+#	if echo "$2" | grep -qF "RxPwr" || echo "$2" | grep -qF "RxSnr" ; then
+#		dividefactor=10
+#	fi
 	
 	if echo "$2" | grep -qF "TxPwr" ; then
-		dividefactor=10
+		dividefactor=1000000
 	fi
 	
 
 	# For the VOO modem, no sign that a dividefactor would be necessary
-	dividefactor=1
+#	dividefactor=1
 
 	echo "SELECT ('Ch. ' || [ChannelNum]) Channel,Min([Timestamp]) Time,IFNULL(Avg([$1])/$dividefactor,'NaN') Value FROM $2 WHERE ([Timestamp] >= $timenow - ($multiplier*$maxcount)) GROUP BY Channel,([Timestamp]/($multiplier)) ORDER BY [ChannelNum] ASC,[Timestamp] DESC;" >> "$7"
 }
