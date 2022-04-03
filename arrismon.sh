@@ -1373,6 +1373,7 @@ Check_Requirements(){
 
 # make sure it's an arris modem
 
+	Print_Output false "Checking modem...this might take a while" "$WARN"
 	/usr/sbin/curl -fsL --retry 3 "http://192.168.100.1/RgConnect.asp" -o chkmdm.tmp >/dev/null || { echo "Cable modem not compatible - error detected when trying to access cable modem's stats"; CHECKSFAILED="true"; }
 	if [ "$(strings chkmdm.tmp | grep -c arris)" -lt 1 ]; then
 		echo "Modem doesn't appear to be an Arris modem"
@@ -1389,7 +1390,7 @@ Check_Requirements(){
 			;;
 		esac
 	fi
-	rm chdmdm.tmp
+	rm chkmdm.tmp
 	
 	if [ ! -f /opt/bin/opkg ]; then
 		Print_Output false "Entware not detected!" "$ERR"
@@ -1455,6 +1456,7 @@ Menu_Install(){
 	
 	touch "$SCRIPT_STORAGE_DIR/modlogs.csv"
 	Process_Upgrade
+	Print_Output false "Getting modem stats..."
 	Get_Modem_Stats
 	
 	Clear_Lock
