@@ -1241,7 +1241,7 @@ MainMenu(){
 	printf "3.    Toggle time output mode\\n      Currently ${SETTING}%s${CLEARFORMAT} time values will be used for CSV exports\\n\\n" "$(OutputTimeMode check)"
 	printf "4.    Set number of days data to keep in database\\n      Currently: ${SETTING}%s days data will be kept${CLEARFORMAT}\\n\\n" "$(DaysToKeep check)"
 	printf "s.    Toggle storage location for stats and config\\n      Current location is ${SETTING}%s${CLEARFORMAT} \\n\\n" "$(ScriptStorageLocation check)"
-#	printf "n.    Show Notice messages from modem logs (Critical and Error always shown)
+	printf "n.    Show Notice messages from modem logs (Critical and Error always shown)"\\n\\n
 	printf "u.    Check for updates\\n"
 	printf "uf.   Update %s with latest version (force update)\\n\\n" "$SCRIPT_NAME"
 	printf "r.    Reset %s database / delete all data\\n\\n" "$SCRIPT_NAME"
@@ -1326,15 +1326,15 @@ MainMenu(){
 				PressEnter
 				break
 			;;
-			e)
-				ScriptHeader
-				printf "\\n${BOLD}Thanks for using %s!${CLEARFORMAT}\\n\\n\\n" "$SCRIPT_NAME"
-				exit 0
-			;;
 			n)
 				printf "\\n"
 				ShowNotice
 				break
+			;;
+			e)
+				ScriptHeader
+				printf "\\n${BOLD}Thanks for using %s!${CLEARFORMAT}\\n\\n\\n" "$SCRIPT_NAME"
+				exit 0
 			;;
 			z)
 				while true; do
