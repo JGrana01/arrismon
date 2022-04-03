@@ -10,8 +10,8 @@ var DragZoom = true;
 var ChartPan = false;
 
 // var metriclist = ['RxPwr','RxSnr','RxPstRs','TxPwr','TxT3Out','TxT4Out'];
-var metriclist = ['RxPwr','RxSnr','RxFreq','RxOctets','RxCorr','RxUncor','TxPwr'];
-var titlelist = ['Downstream Power','Downstream SNR','Frequency','Octets','Corrected','Uncorrectable','Upstream Power'];
+var metriclist = ['RxPwr','RxSnr','RxFreq','RxCorr','RxUncor','SymRate','TxPwr'];
+var titlelist = ['Downstream Power','Downstream SNR','Frequency','Corrected','Uncorrectable', 'Symbol Rate', 'Upstream Power'];
 var measureunitlist = ['dBmV','dB','MHz','','','','dBmV'];
 var chartlist = ['daily','weekly','monthly'];
 var timeunitlist = ['hour','day','day'];
@@ -370,7 +370,7 @@ function getAverage(datasetname){
 
 function startAtZero(datasetname){
 	var starty = false;
-	if(datasetname.indexOf('RxFreq') != -1 || datasetname.indexOf('RxOctets') != -1 || datasetname.indexOf('RxCorr') != -1 || datasetname.indexOf('RxUncor') != -1){
+	if(datasetname.indexOf('RxFreq') != -1 || datasetname.indexOf('SymRate') != -1 || datasetname.indexOf('RxCorr') != -1 || datasetname.indexOf('RxUncor') != -1){
 		starty = true;
 	}
 	return starty;
@@ -463,14 +463,14 @@ function changeChart(e) {
 	else if(name == 'RxFreq'){
 		Draw_Chart('RxFreq',titlelist[2],measureunitlist[2]);
 	}
-	else if(name == 'RxOctets'){
-		Draw_Chart('RxOctets',titlelist[3],measureunitlist[3]);
-	}
 	else if(name == 'RxCorr'){
-		Draw_Chart('RxCorr',titlelist[4],measureunitlist[4]);
+		Draw_Chart('RxCorr',titlelist[3],measureunitlist[3]);
 	}
 	else if(name == 'RxUncor'){
-		Draw_Chart('RxUncor',titlelist[5],measureunitlist[5]);
+		Draw_Chart('RxUncor',titlelist[4],measureunitlist[4]);
+	}
+	else if(name == 'SymRate'){
+		Draw_Chart('Symrate',titlelist[5],measureunitlist[5]);
 	}
 	else if(name == 'TxPwr'){
 		Draw_Chart('TxPwr',titlelist[6],measureunitlist[6]);
