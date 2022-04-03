@@ -1114,6 +1114,9 @@ Generate_Modem_Logs(){
 
 	/usr/sbin/curl -fs --retry 3 --connect-timeout 15 'http://192.168.100.1/RgEventLog.asp' -H 'User-Agent: Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:98.0) Gecko/20100101 Firefox/98.0' -H 'Accept: */*' -H 'X-CSRF-TOKEN: 7d298d27f7ede0df78c9292cdca2cd57' -H 'X-Requested-With: XMLHttpRequest' -H 'Connection: keep-alive' -H 'Cookie: lang=fr; PHPSESSID=9csugaomqu52rqc6vgul600b91; auth=7d298d27f7ede0df78c9292cdca2cd57' > "$shstatsfile_logtbl"
 
+
+	SHOWNOTICE=$(grep "SHOWNOTICE" "$SCRIPT_CONF" | cut -f2 -d"=")
+
 	if [ "$SHOWNOTICE" = "true" ]; then
 		loglist="Critical Error Notice"
 	else
@@ -1122,7 +1125,6 @@ Generate_Modem_Logs(){
 
 	for i in $loglist ; do
 		sed 's///g' "$shstatsfile_logtbl" | strings | grep $i | sed 's%</td><td width="87">%%g' | sed 's%<td width="169">%%g' | sed 's%</td><td width="450">%,%g' | sed 's%</td>%%g' >> "$shstatsfile_logtmp"
-#		sed 's///g' "$shstatsfile_logtbl" | strings | grep Critical | sed 's%</td><td width="87">%%g' | sed 's%<td width="169">%%g' | sed 's%</td><td width="450">%,%g' | sed 's%</td>%%g' > "$shstatsfile_logtmp"
 	done
 
 	logtime="$(date)"
@@ -1241,7 +1243,7 @@ MainMenu(){
 	printf "3.    Toggle time output mode\\n      Currently ${SETTING}%s${CLEARFORMAT} time values will be used for CSV exports\\n\\n" "$(OutputTimeMode check)"
 	printf "4.    Set number of days data to keep in database\\n      Currently: ${SETTING}%s days data will be kept${CLEARFORMAT}\\n\\n" "$(DaysToKeep check)"
 	printf "s.    Toggle storage location for stats and config\\n      Current location is ${SETTING}%s${CLEARFORMAT} \\n\\n" "$(ScriptStorageLocation check)"
-	printf "n.    Show Notice messages from modem logs (Critical and Error always shown)"\\n\\n
+	printf "n.    Show Notice messages from modem logs (Critical and Error always shown)\\n      Currently: ${SETTING}%s${CLEARFORMAT} \\n\\n" "$(ShowNotice check)"
 	printf "u.    Check for updates\\n"
 	printf "uf.   Update %s with latest version (force update)\\n\\n" "$SCRIPT_NAME"
 	printf "r.    Reset %s database / delete all data\\n\\n" "$SCRIPT_NAME"
@@ -1257,6 +1259,7 @@ MainMenu(){
 		case "$menu" in
 			1)
 				printf "\\n"
+				printf "Retrieving stats and logs. This will take some time\\n"
 				if Check_Lock menu; then
 					Get_Modem_Stats
 					Clear_Lock
