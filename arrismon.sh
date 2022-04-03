@@ -725,7 +725,7 @@ WriteSql_ToFile(){
 #		dividefactor=10
 #	fi
 	
-	if echo "$2" | grep -qF "TxPwr" ; then
+	if echo "$2" | grep -qF "RxFreq" ; then
 		dividefactor=1000000
 	fi
 	
