@@ -1342,6 +1342,11 @@ MainMenu(){
 				ShowNotice toggle
 				break
 			;;
+			l)
+				printf "\\n"
+				GetLog
+				break
+			;;
 			e)
 				ScriptHeader
 				printf "\\n${BOLD}Thanks for using %s!${CLEARFORMAT}\\n\\n\\n" "$SCRIPT_NAME"
@@ -1371,6 +1376,15 @@ MainMenu(){
 	ScriptHeader
 	MainMenu
 }
+
+GetLog(){
+
+	printf "\\n${BOLD}Getting logs from modem...hold on\\n\\n"
+	/usr/sbin/curl -fs --retry 3 --connect-timeout 20 'http://192.168.100.1/RgConnect.asp' -H 'User-Agent: Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:98.0) Gecko/20100101 Firefox/98.0' -H 'Accept: */*' -H 'X-CSRF-TOKEN: 7d298d27f7ede0df78c9292cdca2cd57' -H 'X-Requested-With: XMLHttpRequest' -H 'Connection: keep-alive' -H 'Cookie: lang=fr; PHPSESSID=9csugaomqu52rqc6vgul600b91; auth=7d298d27f7ede0df78c9292cdca2cd57'  > "/tmp/arrislog"                 
+	printf "\\n${BOLD}Done, log is /tmp/arrislog\\n\\n"
+	sleep 5
+}
+
 
 Check_Requirements(){
 	CHECKSFAILED="false"
