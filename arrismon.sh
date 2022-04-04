@@ -438,14 +438,16 @@ Auto_Startup(){
 }
 
 
-# The modmon of JackYaz monitored the modem every 30 minutes. arrismon is triggered every 15 minutes, giving more chances to capture instability.
+# The modmon of JackYaz monitored the modem every 30 minutes. belmon triggered every 15 minutes. I arrismon uses 30 since it does tend to do
+# quite a bit of sed/awk/grep stuff.
+
 Auto_Cron(){
 	case $1 in
 		create)
 			STARTUPLINECOUNT=$(cru l | grep -c "$SCRIPT_NAME")
 			
 			if [ "$STARTUPLINECOUNT" -eq 0 ]; then
-				cru a "$SCRIPT_NAME" "1,16,31,46 * * * *  /jffs/scripts/$SCRIPT_NAME generate"
+				cru a "$SCRIPT_NAME" "1,31 * * * *  /jffs/scripts/$SCRIPT_NAME generate"
 			fi
 		;;
 		delete)
@@ -721,17 +723,13 @@ WriteSql_ToFile(){
 	} > "$7"
 	
 	dividefactor=1
-#	if echo "$2" | grep -qF "RxPwr" || echo "$2" | grep -qF "RxSnr" ; then
-#		dividefactor=10
-#	fi
+
+# Arris reports RxFreq in Hz. Convert to MHz
 	
 	if echo "$2" | grep -qF "RxFreq" ; then
 		dividefactor=1000000
 	fi
 	
-
-	# For the VOO modem, no sign that a dividefactor would be necessary
-#	dividefactor=1
 
 	echo "SELECT ('Ch. ' || [ChannelNum]) Channel,Min([Timestamp]) Time,IFNULL(Avg([$1])/$dividefactor,'NaN') Value FROM $2 WHERE ([Timestamp] >= $timenow - ($multiplier*$maxcount)) GROUP BY Channel,([Timestamp]/($multiplier)) ORDER BY [ChannelNum] ASC,[Timestamp] DESC;" >> "$7"
 }
@@ -769,7 +767,7 @@ Get_Modem_Stats(){
 	shstatsfile_usttmp="/tmp/shstats_usttmp.csv"
 	shstatsfile_ust="/tmp/shstats_ust.csv"
 
-# The original version tracks 6 metrics. Note that the Rx/Tx prefix is later used to group metrics.
+# The original version tracks 6 metrics, arrismon does 7. Note that the Rx/Tx prefix is later used to group metrics.
 # Every metrics gets a dedicated SQL table
 # Each table has the same structure
 # Metrics are processed one at a time: a file is created with all INSERT SQL statements for that metric (/tmp/arrismon-stats.sql). 
@@ -791,7 +789,7 @@ Get_Modem_Stats(){
 # The original target modem for modmon produces a file with one value per line, like
 #	"1.3.6.1.2.1.10.127.1.1.4.1.3.2":"1791416",
 # The values in the file are identified by numbers, as per the concept of OIDs in SNMP (https://www.dpstele.com/snmp/what-does-oid-network-elements.php)
-# Belmon code replaced the OID numbers by the name of the metrics (among the 7 defined above, plus some more which are not used any further)
+# Arrismon code replaced the OID numbers by the name of the metrics (among the 7 defined above, plus some more which are not used any further)
 # It then only keeps the lines that start with letters, i.e. the ones that have received a metric name (with letters) instead of the SNMP OID (with digits).
 # The processing also does additional processing to globally prepare the text 
 # Ultimately, that produced a file, $shstatsfile
@@ -980,16 +978,13 @@ Generate_CSVs(){
 	for metric in $metriclist; do
 	{
 		dividefactor=1
-		if echo "$metric" | grep -qF "RxPwr" || echo "$metric" | grep -qF "RxSnr" ; then
-			dividefactor=10
-		fi
+
+		# For the Arris modem, RxFreq needs adjusting
 		
-		if echo "$metric" | grep -qF "TxPwr" ; then
-			dividefactor=10
+		if echo "$metric" | grep -qF "RxFreq" ; then
+			dividefactor=1000000
 		fi
 
-		# For the Arris modem, no sign that a dividefactor would be necessary
-		dividefactor=1
 
 		{
 			echo ".mode csv"
@@ -1149,8 +1144,11 @@ Generate_Modem_Logs(){
 	done < "$shstatsfile_logtmp"
 
 	mv /tmp/modlogs.csv "$SCRIPT_STORAGE_DIR/modlogs.csv"
+
+if [ "$debug" != "true" ]; then
 	rm -f "$shstatsfile_logtbl"
 	rm -f "$shstatsfile_logtmp"
+fi
 }
 
 Reset_DB(){
@@ -1345,6 +1343,16 @@ MainMenu(){
 			l)
 				printf "\\n"
 				GetLog
+				break
+			;;
+			dbon)
+				printf "\\n"
+				debug="true"
+				break
+			;;
+			dboff)
+				printf "\\n"
+				debug="false"
 				break
 			;;
 			e)
