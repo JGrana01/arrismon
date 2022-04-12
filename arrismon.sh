@@ -733,7 +733,7 @@ Authentication(){
 			done
 			
 			if [ "$exitmenu" != "exit" ]; then
-				printf "\\nLogin= "loginname "Password= "password
+				printf "\\nLogin= $loginname Password= $password"
 				return 0
 			else
 				printf "\\n"
