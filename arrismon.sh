@@ -717,7 +717,6 @@ Authentication(){
 				else
 					loginname="$loginname_inp"
 					printf "\\n"
-					break
 				fi
 				
 				printf "\\n${BOLD}Please enter the password for your cable modem:${CLEARFORMAT}  "
@@ -734,6 +733,7 @@ Authentication(){
 			done
 			
 			if [ "$exitmenu" != "exit" ]; then
+				printf "\\nLogin= "loginname "Password= "password
 				return 0
 			else
 				printf "\\n"
