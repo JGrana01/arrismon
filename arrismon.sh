@@ -808,12 +808,14 @@ Get_Modem_Stats(){
 
 # Processing the Rx, DownStream
 
-sed 's///g' "$shstatsfile_curl" | strings | grep QAM | sed 's%<tr><td>%%g' | sed 's%</td><t[dr]>%,%g' | sed 's%</td></tr>%%g' > "$shstatsfile_dsttmp"
+sed 's/
+//g' "$shstatsfile_curl" | strings | grep QAM | sed 's%<tr><td>%%g' | sed 's%</td><t[dr]>%,%g' | sed 's%</td></tr>%%g' > "$shstatsfile_dsttmp"
 awk -F, '{printf("%d,%d,%d,RxChannelID,%d,RxFreq,%d,RxPwr,%d,RxSnr,%d,RxCorr,%d,RxUncor,%d\n", $1, $2, $3, $4, $5, $6, $7, $8, $9)}' "$shstatsfile_dsttmp" > "$shstatsfile_dst"
 
 # Processing the TX, UpStream
 
-sed 's///g' "$shstatsfile_curl" | strings | grep ATDMA | sed 's%<tr><td>%%g' | sed 's%</td><t[dr]>%,%g' | sed 's%</td></tr>%%g' > "$shstatsfile_usttmp"
+sed 's/
+//g' "$shstatsfile_curl" | strings | grep ATDMA | sed 's%<tr><td>%%g' | sed 's%</td><t[dr]>%,%g' | sed 's%</td></tr>%%g' > "$shstatsfile_usttmp"
 awk -F, '{printf("%d,%d,%d,TxChannelID,%d,SymRate,%d,TxFreq,%d,TxPwr,%d\n", $1, $2, $3, $4, $5, $6, $7 )}' "$shstatsfile_usttmp" > "$shstatsfile_ust"
 
 # final filtering of text
@@ -1129,7 +1131,8 @@ Generate_Modem_Logs(){
 	fi
 
 	for i in $loglist ; do
-		sed 's///g' "$shstatsfile_logtbl" | strings | grep $i | sed 's%</td><td width="87">%%g' | sed 's%<td width="169">%%g' | sed 's%</td><td width="450">%,%g' | sed 's%</td>%%g' >> "$shstatsfile_logtmp"
+		sed 's/
+//g' "$shstatsfile_logtbl" | strings | grep $i | sed 's%</td><td width="87">%%g' | sed 's%<td width="169">%%g' | sed 's%</td><td width="450">%,%g' | sed 's%</td>%%g' >> "$shstatsfile_logtmp"
 	done
 
 # annoyningly Arris doesn't timestamp each log messages. They are clustered and Im still trying to figure out how to deal with this
@@ -1250,6 +1253,7 @@ MainMenu(){
 	printf "4.    Set number of days data to keep in database\\n      Currently: ${SETTING}%s days data will be kept${CLEARFORMAT}\\n\\n" "$(DaysToKeep check)"
 	printf "s.    Toggle storage location for stats and config\\n      Current location is ${SETTING}%s${CLEARFORMAT} \\n\\n" "$(ScriptStorageLocation check)"
 	printf "n.    Toggle Show Notice messages from modem logs (Critical and Error always shown)\\n      Currently: ${SETTING}%s${CLEARFORMAT} \\n\\n" "$(ShowNotice check)"
+	printf "a.    Authenticate: enter login name & password if required for your cable modem (optional)\\n\\n"
 	printf "u.    Check for updates\\n"
 	printf "uf.   Update %s with latest version (force update)\\n\\n" "$SCRIPT_NAME"
 	printf "r.    Reset %s database / delete all data\\n\\n" "$SCRIPT_NAME"
