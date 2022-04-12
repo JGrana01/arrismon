@@ -352,7 +352,7 @@ Conf_Exists(){
 		fi
 		return 0
 	else
-		{ echo "OUTPUTDATAMODE=average"; echo "OUTPUTTIMEMODE=unix"; echo "STORAGELOCATION=jffs"; echo "SHOWNOTICE=false"; echo "DAYSTOKEEP=30"; } > "$SCRIPT_CONF"
+		{ echo "OUTPUTDATAMODE=average"; echo "OUTPUTTIMEMODE=unix"; echo "STORAGELOCATION=jffs"; echo "SHOWNOTICE=false"; echo "DAYSTOKEEP=30; echo "LOGINNAME=*NA"; echo "PASSWORD=*NA"; } > "$SCRIPT_CONF"
 		return 1
 	fi
 }
@@ -703,8 +703,8 @@ DaysToKeep(){
 Authentication(){
 	case "$1" in
 		update)
-			loginname=""
-			password=""
+			loginname="*NA"
+			password="*NA"
 			exitmenu=""
 			ScriptHeader
 			while true; do
@@ -733,13 +733,17 @@ Authentication(){
 			done
 			
 			if [ "$exitmenu" != "exit" ]; then
-				printf "\\nLogin= $loginname Password= $password"
+				sed -i 's/^LOGINNAME.*$/LOGINNAME='"$loginname"'/' "$SCRIPT_CONF"
+				sed -i 's/^PASSWORD.*$/PASSWORD='"$password"'/' "$SCRIPT_CONF"
 				return 0
 			else
 				printf "\\n"
 				return 1
 			fi
 		;;
+		check)
+			LOGINNAME=$(grep "LOGINNAME" "$SCRIPT_CONF" | cut -f2 -d"=")
+			echo "$LOGINNAME"
 	esac
 }
 
@@ -1297,7 +1301,7 @@ MainMenu(){
 	printf "4.    Set number of days data to keep in database\\n      Currently: ${SETTING}%s days data will be kept${CLEARFORMAT}\\n\\n" "$(DaysToKeep check)"
 	printf "s.    Toggle storage location for stats and config\\n      Current location is ${SETTING}%s${CLEARFORMAT} \\n\\n" "$(ScriptStorageLocation check)"
 	printf "n.    Toggle Show Notice messages from modem logs (Critical and Error always shown)\\n      Currently: ${SETTING}%s${CLEARFORMAT} \\n\\n" "$(ShowNotice check)"
-	printf "a.    Authenticate: enter login name & password if required for your cable modem (optional)\\n\\n"
+	printf "a.    Authenticate: enter login name & password if required for your cable modem (optional)\\n      Currently: ${SETTING}%s${CLEARFORMAT} \\n\\n" "$(Authentication check)"
 	printf "u.    Check for updates\\n"
 	printf "uf.   Update %s with latest version (force update)\\n\\n" "$SCRIPT_NAME"
 	printf "r.    Reset %s database / delete all data\\n\\n" "$SCRIPT_NAME"
