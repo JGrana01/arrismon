@@ -700,6 +700,50 @@ DaysToKeep(){
 	esac
 }
 
+Authentication(){
+	case "$1" in
+		update)
+			loginname=""
+			password=""
+			exitmenu=""
+			ScriptHeader
+			while true; do
+				printf "\\n${BOLD}Please enter the login name for your cable modem:${CLEARFORMAT}  "
+				read -r loginname_inp
+				
+				if [ "$loginname_inp" = "e" ]; then
+					exitmenu="exit"
+					break
+				else
+					loginname="$loginname_inp"
+					printf "\\n"
+					break
+				fi
+				
+				printf "\\n${BOLD}Please enter the password for your cable modem:${CLEARFORMAT}  "
+				read -r password_inp
+				
+				if [ "$password_inp" = "e" ]; then
+					exitmenu="exit"
+					break
+				else
+					password="$password_inp"
+					printf "\\n"
+					break
+				fi
+			done
+			
+			if [ "$exitmenu" != "exit" ]; then
+				return 0
+			else
+				printf "\\n"
+				return 1
+			fi
+		;;
+	esac
+}
+
+
 WriteStats_ToJS(){
 	echo "function $3(){" > "$2"
 	html='document.getElementById("'"$4"'").innerHTML="'
@@ -1310,6 +1354,12 @@ MainMenu(){
 					ScriptStorageLocation jffs
 					Create_Symlinks
 				fi
+				break
+			;;
+			a)
+				printf "\\n"
+				Authentication update
+				PressEnter
 				break
 			;;
 			u)
