@@ -21,8 +21,10 @@
 ### Start of script variables ###
 readonly SCRIPT_NAME="arrismon"
 readonly SCRIPT_VERSION="v0.1.1-beta"
-SCRIPT_BRANCH="master"
-SCRIPT_REPO="https://raw.githubusercontent.com/JGrana01/$SCRIPT_NAME/$SCRIPT_BRANCH"
+## SCRIPT_BRANCH="master"
+SCRIPT_BRANCH="Authenticate"
+## SCRIPT_REPO="https://raw.githubusercontent.com/JGrana01/$SCRIPT_NAME/$SCRIPT_BRANCH"
+SCRIPT_REPO="https://raw.githubusercontent.com/WRKDBF-Guy/$SCRIPT_NAME/$SCRIPT_BRANCH"
 readonly SCRIPT_DIR="/jffs/addons/$SCRIPT_NAME.d"
 readonly SCRIPT_WEBPAGE_DIR="$(readlink /www/user)"
 readonly SCRIPT_WEB_DIR="$SCRIPT_WEBPAGE_DIR/$SCRIPT_NAME"
@@ -799,7 +801,7 @@ Get_Modem_Stats(){
 	Create_Symlinks
 	Auto_Startup create 2>/dev/null
 	Auto_Cron create 2>/dev/null
-	Auto_ServiceEvent create 2>/dev/nul
+	Auto_ServiceEvent create 2>/dev/null
 	Shortcut_Script create
 	
 	TZ=$(cat /etc/TZ)
