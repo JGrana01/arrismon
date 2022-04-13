@@ -1498,7 +1498,7 @@ Check_Requirements(){
 	if [ "$CHECKSFAILED" = "false" ]; then
 		Print_Output false "Installing required packages from Entware" "$PASS"
 		opkg update
-		opkg install sqlite3-cli
+	##	opkg install sqlite3-cli
 		opkg install p7zip
 		opkg install coreutils-paste
 		opkg install findutils
