@@ -36,7 +36,7 @@ readonly SHARED_WEB_DIR="$SCRIPT_WEBPAGE_DIR/shared-jy"
 
 # useful debug output when necessary
 # Do NOT enable when invoked by cru - it will block
-debug="false"
+debug="true"
 
 ### End of script variables ###
 
