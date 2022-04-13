@@ -49,43 +49,7 @@ readonly BOLD="\\e[1m"
 readonly SETTING="${BOLD}\\e[36m"
 readonly CLEARFORMAT="\\e[0m"
 ### End of output format variables ###
-MenuX(){
-	printf "WebUI for %s Arris is available at:\\n${SETTING}%s${CLEARFORMAT}\\n\\n" "$SCRIPT_NAME" "$(Get_WebUI_URL)"
-	printf "1.    Check stats now\\n\\n"
-	printf "2.    Toggle data output mode\\n      Currently ${SETTING}%s${CLEARFORMAT} values will be used for weekly and monthly charts\\n\\n" "$(OutputDataMode check)"
-	printf "3.    Toggle time output mode\\n      Currently ${SETTING}%s${CLEARFORMAT} time values will be used for CSV exports\\n\\n" "$(OutputTimeMode check)"
-	printf "4.    Set number of days data to keep in database\\n      Currently: ${SETTING}%s days data will be kept${CLEARFORMAT}\\n\\n" "$(DaysToKeep check)"
-	printf "s.    Toggle storage location for stats and config\\n      Current location is ${SETTING}%s${CLEARFORMAT} \\n\\n" "$(ScriptStorageLocation check)"
-	printf "n.    Toggle Show Notice messages from modem logs (Critical and Error always shown)\\n      Currently: ${SETTING}%s${CLEARFORMAT} \\n\\n" "$(ShowNotice check)"
-	printf "a.    Authenticate: enter login name & password if required for your cable modem (optional)\\n      Currently: ${SETTING}%s${CLEARFORMAT} \\n\\n" "$(Authentication check)"
-	printf "u.    Check for updates\\n"
-	printf "uf.   Update %s with latest version (force update)\\n\\n" "$SCRIPT_NAME"
-	printf "r.    Reset %s database / delete all data\\n\\n" "$SCRIPT_NAME"
-	printf "e.    Exit %s\\n\\n" "$SCRIPT_NAME"
-	printf "z.    Uninstall %s\\n" "$SCRIPT_NAME"
-	printf "\\n"
-	printf "${BOLD}############################################################${CLEARFORMAT}\\n"
-	printf "\\n"
-	
-	while true; do
-		printf "Choose an option:  "
-		read -r menu
-		case "$menu" in
-			u)
-				printf "\\n"
-				if Check_Lock menu; then
-					Update_Version
-					Clear_Lock
-				fi
-				PressEnter
-				break
-			;;
-		esac
-	done
-	
-	ScriptHeader
-	MainMenu
-}	
+
 # $1 = print to syslog, $2 = message to print, $3 = log level
 Print_Output(){
 	if [ "$1" = "true" ]; then
