@@ -1232,6 +1232,7 @@ Process_Upgrade(){
 		renice 15 $$
 		Print_Output true "Creating database table indexes..." "$PASS"
 		
+		/usr/sbin/curl "http://192.168.100.1/goform/login" -H "Content-Type: application/x-www-form-urlencoded" --data "loginUsername=admin&loginPassword=CableBox#8"
 		metriclist="RxPwr RxSnr RxFreq RxCorr RxUncor SymRate TxPwr"		
 		for metric in $metriclist; do
 			echo "CREATE INDEX IF NOT EXISTS idx_${metric}_time_measurement ON [modstats_$metric] (Timestamp,Measurement);" > /tmp/arrismon-upgrade.sql
