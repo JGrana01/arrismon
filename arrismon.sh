@@ -859,14 +859,12 @@ Get_Modem_Stats(){
 
 # Processing the Rx, DownStream
 
-sed 's/
-//g' "$shstatsfile_curl" | strings | grep QAM | sed 's%<tr><td>%%g' | sed 's%</td><t[dr]>%,%g' | sed 's%</td></tr>%%g' > "$shstatsfile_dsttmp"
+sed 's///g' "$shstatsfile_curl" | strings | grep QAM | sed 's%<tr><td>%%g' | sed 's%</td><t[dr]>%,%g' | sed 's%</td></tr>%%g' > "$shstatsfile_dsttmp"
 awk -F, '{printf("%d,%d,%d,RxChannelID,%d,RxFreq,%d,RxPwr,%d,RxSnr,%d,RxCorr,%d,RxUncor,%d\n", $1, $2, $3, $4, $5, $6, $7, $8, $9)}' "$shstatsfile_dsttmp" > "$shstatsfile_dst"
 
 # Processing the TX, UpStream
 
-sed 's/
-//g' "$shstatsfile_curl" | strings | grep ATDMA | sed 's%<tr><td>%%g' | sed 's%</td><t[dr]>%,%g' | sed 's%</td></tr>%%g' > "$shstatsfile_usttmp"
+sed 's///g' "$shstatsfile_curl" | strings | grep ATDMA | sed 's%<tr><td>%%g' | sed 's%</td><t[dr]>%,%g' | sed 's%</td></tr>%%g' > "$shstatsfile_usttmp"
 awk -F, '{printf("%d,%d,%d,TxChannelID,%d,SymRate,%d,TxFreq,%d,TxPwr,%d\n", $1, $2, $3, $4, $5, $6, $7 )}' "$shstatsfile_usttmp" > "$shstatsfile_ust"
 
 # final filtering of text
