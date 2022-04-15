@@ -36,7 +36,7 @@ readonly SHARED_WEB_DIR="$SCRIPT_WEBPAGE_DIR/shared-jy"
 
 # useful debug output when necessary
 # Do NOT enable when invoked by cru - it will block
-debug="true"
+debug="false"
 
 ### End of script variables ###
 
@@ -851,8 +851,7 @@ Get_Modem_Stats(){
 # sorry about the intermediate tmp files - fear of lines to long
 # todo for another day
 
-	return_code=$(curl "http://192.168.100.1/goform/login" -H "Content-Type: application/x-www-form-urlencoded" --data "loginUsername=admin&loginPassword=CableBox#8")
-	echo "Response code= $return_code"
+	/usr/sbin/curl "http://192.168.100.1/goform/login" -H "Content-Type: application/x-www-form-urlencoded" --data "loginUsername=admin&loginPassword=CableBox#8"
 	/usr/sbin/curl -fs --retry 3 --connect-timeout 20 'http://192.168.100.1/RgConnect.asp' -H 'User-Agent: Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:98.0) Gecko/20100101 Firefox/98.0' -H 'Accept: */*' -H 'X-CSRF-TOKEN: 7d298d27f7ede0df78c9292cdca2cd57' -H 'X-Requested-With: XMLHttpRequest' -H 'Connection: keep-alive' -H 'Cookie: lang=fr; PHPSESSID=9csugaomqu52rqc6vgul600b91; auth=7d298d27f7ede0df78c9292cdca2cd57'  > "$shstatsfile_curl"
 
 # sed and awk away...(btw, need the strings pipe so grep believes its simply a text file)
