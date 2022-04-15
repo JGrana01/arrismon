@@ -20,7 +20,7 @@
 
 ### Start of script variables ###
 readonly SCRIPT_NAME="arrismon"
-readonly SCRIPT_VERSION="v0.1.1-beta"
+readonly SCRIPT_VERSION="v0.2.1-beta"
 SCRIPT_BRANCH="master"
 SCRIPT_REPO="https://raw.githubusercontent.com/JGrana01/$SCRIPT_NAME/$SCRIPT_BRANCH"
 readonly SCRIPT_DIR="/jffs/addons/$SCRIPT_NAME.d"
@@ -1268,6 +1268,7 @@ ScriptHeader(){
 	printf "${BOLD}##                                                     ##${CLEARFORMAT}\\n"
 	printf "${BOLD}##        https://github.com/JGrana01/arrismon         ##${CLEARFORMAT}\\n"
 	printf "${BOLD}##                                                     ##${CLEARFORMAT}\\n"
+	printf "${BOLD}##                $SCRIPT_VERSION                          ##${CLEARFORMAT}\\n"
 	printf "${BOLD}#########################################################${CLEARFORMAT}\\n"
 	printf "\\n"
 }
