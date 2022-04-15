@@ -218,6 +218,30 @@ Update_Version(){
 	fi
 }
 
+
+Update_Corr(){
+
+		if [ $2 == 0 ] && [ ! -f "$SCRIPT_DIR/$1.$3" ]; then
+			newcorr=0
+			return
+		fi
+		if [ ! -f "$SCRIPT_DIR/$1.$3" ]; then
+			echo 0 > "$SCRIPT_DIR/$1.$3"
+		fi
+		oldcorr="$(cat "$SCRIPT_DIR/$1.$3")"
+
+# carefull - arris reset counters!
+
+		if [ "$2" == 0 ]; then
+			newcorr=0
+		else
+			newcorr=$(($2-oldcorr))	
+		fi
+# keep the value modem presents
+		echo $2 > "$SCRIPT_DIR/$1.$3"
+}
+
+
 Update_File(){
 	if [ "$1" = "arrismonstats_www.asp" ]; then
 		tmpfile="/tmp/$1"
@@ -751,7 +775,7 @@ Get_Modem_Stats(){
 	Create_Symlinks
 	Auto_Startup create 2>/dev/null
 	Auto_Cron create 2>/dev/null
-	Auto_ServiceEvent create 2>/dev/nul
+	Auto_ServiceEvent create 2>/dev/null
 	Shortcut_Script create
 	
 	TZ=$(cat /etc/TZ)
@@ -808,12 +832,14 @@ Get_Modem_Stats(){
 
 # Processing the Rx, DownStream
 
-sed 's///g' "$shstatsfile_curl" | strings | grep QAM | sed 's%<tr><td>%%g' | sed 's%</td><t[dr]>%,%g' | sed 's%</td></tr>%%g' > "$shstatsfile_dsttmp"
+#sed 's///g' "$shstatsfile_curl" | strings | grep QAM | sed 's%<tr><td>%%g' | sed 's%</td><t[dr]>%,%g' | sed 's%</td></tr>%%g' > "$shstatsfile_dsttmp"
+sed 's/\r//g' "$shstatsfile_curl" | strings | grep QAM | sed 's%<tr><td>%%g' | sed 's%</td><t[dr]>%,%g' | sed 's%</td></tr>%%g' > "$shstatsfile_dsttmp"
 awk -F, '{printf("%d,%d,%d,RxChannelID,%d,RxFreq,%d,RxPwr,%d,RxSnr,%d,RxCorr,%d,RxUncor,%d\n", $1, $2, $3, $4, $5, $6, $7, $8, $9)}' "$shstatsfile_dsttmp" > "$shstatsfile_dst"
 
 # Processing the TX, UpStream
 
-sed 's///g' "$shstatsfile_curl" | strings | grep ATDMA | sed 's%<tr><td>%%g' | sed 's%</td><t[dr]>%,%g' | sed 's%</td></tr>%%g' > "$shstatsfile_usttmp"
+#sed 's///g' "$shstatsfile_curl" | strings | grep ATDMA | sed 's%<tr><td>%%g' | sed 's%</td><t[dr]>%,%g' | sed 's%</td></tr>%%g' > "$shstatsfile_usttmp"
+sed 's/\r//g' "$shstatsfile_curl" | strings | grep ATDMA | sed 's%<tr><td>%%g' | sed 's%</td><t[dr]>%,%g' | sed 's%</td></tr>%%g' > "$shstatsfile_usttmp"
 awk -F, '{printf("%d,%d,%d,TxChannelID,%d,SymRate,%d,TxFreq,%d,TxPwr,%d\n", $1, $2, $3, $4, $5, $6, $7 )}' "$shstatsfile_usttmp" > "$shstatsfile_ust"
 
 # final filtering of text
@@ -875,10 +901,14 @@ fi
 									   measurement="$(grep "$metric"   $shstatsfile | sed "$counter!d" | cut -d',' -f7)"
 					;;
 					"RxCorr")
-									   measurement="$(grep "$metric"   $shstatsfile | sed "$counter!d" | cut -d',' -f13)"
+									   modemcorr="$(grep "$metric"   $shstatsfile | sed "$counter!d" | cut -d',' -f13)"
+									   Update_Corr RxCorr $modemcorr $counter
+									   measurement=$newcorr
 					;;
 					"RxUncor")
-									   measurement="$(grep "$metric"   $shstatsfile | sed "$counter!d" | cut -d',' -f15)"
+									   modemcorr="$(grep "$metric"   $shstatsfile | sed "$counter!d" | cut -d',' -f15)"
+									   Update_Corr RxUncor $modemcorr $counter
+									   measurement=$newcorr
 					;;
 					"SymRate")
 									   measurement="$(grep "$metric"   $shstatsfile | sed "$counter!d" | cut -d',' -f7)"
