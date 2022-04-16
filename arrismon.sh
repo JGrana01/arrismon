@@ -1188,8 +1188,7 @@ Generate_Modem_Logs(){
 	fi
 
 	for i in $loglist ; do
-		sed 's/
-//g' "$shstatsfile_logtbl" | strings | grep $i | sed 's%</td><td width="87">%%g' | sed 's%<td width="169">%%g' | sed 's%</td><td width="450">%,%g' | sed 's%</td>%%g' >> "$shstatsfile_logtmp"
+		sed 's/\r//g' "$shstatsfile_logtbl" | strings | grep $i | sed 's%</td><td width="87">%%g' | sed 's%<td width="169">%%g' | sed 's%</td><td width="450">%,%g' | sed 's%</td>%%g' >> "$shstatsfile_logtmp"
 	done
 
 # annoyningly Arris doesn't timestamp each log messages. They are clustered and Im still trying to figure out how to deal with this
