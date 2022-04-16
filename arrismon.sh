@@ -722,9 +722,19 @@ Authentication(){
 				fi
 				
 				printf "\\n${BOLD}Please enter the password for your cable modem:${CLEARFORMAT}  "
-				stty -echo
-				read -r password_inp
-				stty echo
+			##	stty -echo
+			##	read -r password_inp
+			##	stty echo
+				
+				while IFS= read -r -n1 -s char
+					do
+ 					  [[ "$char" == '' ]] && break
+					  prompt='*'
+					  password_inp+="$char"
+				done
+				echo >&2
+				echo "Password=$password_inp"
+				echo "Password length = $(echo -n "$password_inp" | wc -c)"
 				
 				if [ "$password_inp" = "e" ]; then
 					exitmenu="exit"
