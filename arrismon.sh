@@ -854,7 +854,13 @@ Get_Modem_Stats(){
 # sorry about the intermediate tmp files - fear of lines to long
 # todo for another day
 
-	/usr/sbin/curl "http://192.168.100.1/goform/login" -H "Content-Type: application/x-www-form-urlencoded" --data "loginUsername=$LOGINNAME&loginPassword=$PASSWORD"
+	LOGINNAME=$(grep "LOGINNAME" "$SCRIPT_CONF" | cut -f2 -d"=")
+	PASSWORD=$(grep "PASSWORD" "$SCRIPT_CONF" | cut -f2 -d"=")
+	
+	if [ "$LOGINNAME" != "*NA" ]; then
+		/usr/sbin/curl "http://192.168.100.1/goform/login" -H "Content-Type: application/x-www-form-urlencoded" --data "loginUsername=$LOGINNAME&loginPassword=$PASSWORD"
+	fi
+	
 	/usr/sbin/curl -fs --retry 3 --connect-timeout 20 'http://192.168.100.1/RgConnect.asp' -H 'User-Agent: Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:98.0) Gecko/20100101 Firefox/98.0' -H 'Accept: */*' -H 'X-CSRF-TOKEN: 7d298d27f7ede0df78c9292cdca2cd57' -H 'X-Requested-With: XMLHttpRequest' -H 'Connection: keep-alive' -H 'Cookie: lang=fr; PHPSESSID=9csugaomqu52rqc6vgul600b91; auth=7d298d27f7ede0df78c9292cdca2cd57'  > "$shstatsfile_curl"
 
 # sed and awk away...(btw, need the strings pipe so grep believes its simply a text file)
@@ -1233,7 +1239,6 @@ Process_Upgrade(){
 		renice 15 $$
 		Print_Output true "Creating database table indexes..." "$PASS"
 		
-		/usr/sbin/curl "http://192.168.100.1/goform/login" -H "Content-Type: application/x-www-form-urlencoded" --data "loginUsername=admin&loginPassword=CableBox#8"
 		metriclist="RxPwr RxSnr RxFreq RxCorr RxUncor SymRate TxPwr"		
 		for metric in $metriclist; do
 			echo "CREATE INDEX IF NOT EXISTS idx_${metric}_time_measurement ON [modstats_$metric] (Timestamp,Measurement);" > /tmp/arrismon-upgrade.sql
