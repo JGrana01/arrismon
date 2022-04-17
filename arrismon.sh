@@ -727,10 +727,12 @@ Authentication(){
 				printf "\\n${BOLD}Please enter the password for your cable modem:${CLEARFORMAT}  "
 
 				while read -r -n1 -s character; do
-					password_str="$password_str$character
+					password_str=$password_str$character
 					echo -n '*'
+				done
+
 					
-					Case $character In
+					case "$character" In
 						"Z")
 							exitmenu="exit"
 							break
