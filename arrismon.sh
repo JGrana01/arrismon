@@ -712,8 +712,8 @@ Authentication(){
 			character=""
 			
 			ScriptHeader
+			printf "\\n${BOLD}Please enter the login name for your cable modem:${CLEARFORMAT}  "
 			while true; do
-				printf "\\n${BOLD}Please enter the login name for your cable modem:${CLEARFORMAT}  "
 				read -r loginname_inp
 				
 				if [ "$loginname_inp" = "e" ]; then
@@ -729,16 +729,19 @@ Authentication(){
 				while read -r -n1 -s character; do
 					password_str="$password_str$character
 					echo -n '*'
+					
+					Case $character In
+						"Z")
+							exitmenu="exit"
+							break
+						;;
+						"")
+							break
+						;;
+					esac	
 				done
 			  	
-		##		stty -echo
-		##		read -r password_str
-		##		stty echo
-				
-				if [ "$password_str" = "e" ]; then
-					exitmenu="exit"
-					break
-				else
+				if [ "$exitmenu" != "exit" ]; then
 					password="$password_str"
 					printf "\\n"
 					break
