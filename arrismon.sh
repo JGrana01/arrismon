@@ -708,6 +708,9 @@ Authentication(){
 			loginname="*NA"
 			password="*NA"
 			exitmenu=""
+			password_str=""
+			character=""
+			
 			ScriptHeader
 			while true; do
 				printf "\\n${BOLD}Please enter the login name for your cable modem:${CLEARFORMAT}  "
@@ -722,15 +725,21 @@ Authentication(){
 				fi
 				
 				printf "\\n${BOLD}Please enter the password for your cable modem:${CLEARFORMAT}  "
-			  	stty -echo
-				read -r password_inp
-				stty echo
+
+				while read -r -n1 -s character; do
+					password_str="$password_str$character
+					echo -n '*'
+				done
+			  	
+		##		stty -echo
+		##		read -r password_str
+		##		stty echo
 				
-				if [ "$password_inp" = "e" ]; then
+				if [ "$password_str" = "e" ]; then
 					exitmenu="exit"
 					break
 				else
-					password="$password_inp"
+					password="$password_str"
 					printf "\\n"
 					break
 				fi
