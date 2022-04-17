@@ -732,7 +732,7 @@ Authentication(){
 				done
 
 					
-					case "$character" In
+					case "$character" in
 						"Z")
 							exitmenu="exit"
 							break
