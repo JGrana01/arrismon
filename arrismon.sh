@@ -761,6 +761,7 @@ Authentication(){
 			LOGINNAME=$(grep "LOGINNAME" "$SCRIPT_CONF" | cut -f2 -d"=")
 			PASSWORD=$(grep "PASSWORD" "$SCRIPT_CONF" | cut -f2 -d"=")
 			echo "$LOGINNAME"
+		;;
 	esac
 }
 
