@@ -729,9 +729,7 @@ Authentication(){
 				while read -r -n1 -s character; do
 					password_str=$password_str$character
 					echo -n '*'
-				done
-
-					
+			
 					case "$character" in
 						"Z")
 							exitmenu="exit"
