@@ -726,19 +726,18 @@ Credentials(){
 				
 				printf "\\n${BOLD}Please enter the password for your cable modem:${CLEARFORMAT}  "
 
-				while read -r -n1 -s character; do
-					password_str=$password_str$character
-					echo -n '*'
-			
+				while read -r -n1 -s character; do				
 					case "$character" in
-						"Z")
+						$'\e')
 							exitmenu="exit"
 							break
 						;;
 						"")
 							break
 						;;
-					esac	
+							password_str=$password_str$character
+							echo -n '*'
+					esac
 				done
 			  	
 				if [ "$exitmenu" != "exit" ]; then
