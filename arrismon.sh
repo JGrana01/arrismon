@@ -729,7 +729,7 @@ Credentials(){
 				while read -r -n1 -s character; do
 
 					case "$character" in
-						$'\e')
+						$'\E')
 							exitmenu="exit"
 							break
 						;;
