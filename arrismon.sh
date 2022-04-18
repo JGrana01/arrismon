@@ -22,7 +22,7 @@
 readonly SCRIPT_NAME="arrismon"
 readonly SCRIPT_VERSION="v0.1.1-beta"
 ## SCRIPT_BRANCH="master"
-SCRIPT_BRANCH="Authenticate"
+SCRIPT_BRANCH="Credentials"
 ## SCRIPT_REPO="https://raw.githubusercontent.com/JGrana01/$SCRIPT_NAME/$SCRIPT_BRANCH"
 SCRIPT_REPO="https://raw.githubusercontent.com/WRKDBF-Guy/$SCRIPT_NAME/$SCRIPT_BRANCH"
 readonly SCRIPT_DIR="/jffs/addons/$SCRIPT_NAME.d"
@@ -702,7 +702,7 @@ DaysToKeep(){
 	esac
 }
 
-Authentication(){
+Credentials(){
 	case "$1" in
 		update)
 			loginname="*NA"
@@ -1322,7 +1322,7 @@ MainMenu(){
 	printf "4.    Set number of days data to keep in database\\n      Currently: ${SETTING}%s days data will be kept${CLEARFORMAT}\\n\\n" "$(DaysToKeep check)"
 	printf "s.    Toggle storage location for stats and config\\n      Current location is ${SETTING}%s${CLEARFORMAT} \\n\\n" "$(ScriptStorageLocation check)"
 	printf "n.    Toggle Show Notice messages from modem logs (Critical and Error always shown)\\n      Currently: ${SETTING}%s${CLEARFORMAT} \\n\\n" "$(ShowNotice check)"
-	printf "a.    Authenticate: enter login name & password if required for your cable modem (optional)\\n      Currently: ${SETTING}%s${CLEARFORMAT} \\n\\n" "$(Authentication check)"
+	printf "a.    Credentials: enter login name & password if required for your cable modem (optional)\\n      Currently: ${SETTING}%s${CLEARFORMAT} \\n\\n" "$(Credentials check)"
 	printf "u.    Check for updates\\n"
 	printf "uf.   Update %s with latest version (force update)\\n\\n" "$SCRIPT_NAME"
 	printf "r.    Reset %s database / delete all data\\n\\n" "$SCRIPT_NAME"
@@ -1383,7 +1383,7 @@ MainMenu(){
 			;;
 			a)
 				printf "\\n"
-				Authentication update
+				Credentials update
 				PressEnter
 				break
 			;;
