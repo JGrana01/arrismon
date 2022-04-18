@@ -726,7 +726,8 @@ Credentials(){
 				
 				printf "\\n${BOLD}Please enter the password for your cable modem:${CLEARFORMAT}  "
 
-				while read -r -n1 -s character; do				
+				while read -r -n1 -s character; do
+
 					case "$character" in
 						$'\e')
 							exitmenu="exit"
@@ -735,6 +736,7 @@ Credentials(){
 						"")
 							break
 						;;
+						*)
 							password_str=$password_str$character
 							echo -n '*'
 					esac
