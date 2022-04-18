@@ -744,6 +744,7 @@ Credentials(){
 			  	
 				if [ "$exitmenu" != "exit" ]; then
 					password="$password_str"
+					printf "\\n"
 				fi
 				break
 			done
