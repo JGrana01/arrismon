@@ -705,15 +705,16 @@ DaysToKeep(){
 Credentials(){
 	case "$1" in
 		update)
-			loginname="*NA"
-			password="*NA"
-			exitmenu=""
-			password_str=""
-			character=""
-			
-			ScriptHeader
-			printf "\\n${BOLD}Please enter the login name for your cable modem:${CLEARFORMAT}  "
 			while true; do
+				loginname="*NA"
+				password="*NA"
+				exitmenu=""
+				loginname_inp=""
+				password_inp=""
+			
+				ScriptHeader
+				printf "\\n${BOLD}Please enter the login name for your cable modem:${CLEARFORMAT}  "
+			
 				read -r loginname_inp
 				if [ "$loginname_inp" = "e" ]; then
 					exitmenu="exit"
