@@ -715,37 +715,27 @@ Credentials(){
 			printf "\\n${BOLD}Please enter the login name for your cable modem:${CLEARFORMAT}  "
 			while true; do
 				read -r loginname_inp
-				
 				if [ "$loginname_inp" = "e" ]; then
 					exitmenu="exit"
 					break
-				else
-					loginname="$loginname_inp"
-					printf "\\n"
 				fi
 				
-				printf "\\n${BOLD}Please enter the password for your cable modem:${CLEARFORMAT}  "
-
-				while read -r -n1 -s character; do
-
-					case "$character" in
-						$'\E')
-							exitmenu="exit"
-							break
-						;;
-						"")
-							break
-						;;
-						*)
-							password_str=$password_str$character
-							echo -n '*'
-					esac
-				done
-			  	
-				if [ "$exitmenu" != "exit" ]; then
-					password="$password_str"
-					printf "\\n"
+				loginname="$loginname_inp"
+				printf "\\n"	
+				printf "\\n${BOLD}Please enter the password for your cable modem:${CLEARFORM}  "
+				
+				stty -echo
+				read -r password_inp
+				stty echo
+				if [ "$password_inp" = "e" ]; then
+					exitmenu="exit"
+					break
 				fi
+				password="$password_inp"
+				printf "\\n"
+				
+				/usr/sbin/curl -v "http://192.168.100.1/goform/login" --data "loginUsername=$LOGINNAME&loginPassword=$PASSWORD" 2> /tmp/checkcreds.txt
+				
 				break
 			done
 			
