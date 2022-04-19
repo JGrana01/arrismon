@@ -739,9 +739,9 @@ Credentials(){
 				if [ "$(grep -c "login.asp" "/tmp/checkcreds.txt")" -gt 0 ]; then
 					printf "\\n"	
 					printf "\\n${BOLD}Login name and/or password is invalid.  Please retry.${CLEARFORM}  "
+				else
+					break
 				fi
-				
-				break
 			done
 			
 			if [ "$exitmenu" != "exit" ]; then
