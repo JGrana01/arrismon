@@ -724,7 +724,7 @@ Credentials(){
 				
 				loginname="$loginname_inp"
 				printf "\\n"	
-				printf "\\n${BOLD}Please enter the password for your cable modem:${CLEARFORM}  "
+				printf "\\n${BOLD}Please enter the password for your cable modem:${CLEARFORMAT}  "
 				
 				stty -echo
 				read -r password_inp
@@ -740,7 +740,7 @@ Credentials(){
 				/usr/sbin/curl -v "http://192.168.100.1/goform/login" --data "loginUsername=$loginname&loginPassword=$password" 2> /tmp/checkcreds.txt
 				if [ "$(grep -c "login.asp" "/tmp/checkcreds.txt")" -gt 0 ]; then
 					printf "\\n"	
-					printf "\\n${BOLD}Login name and/or password is invalid.  Please retry.${CLEARFORM}  "
+					printf "\\n${BOLD}Login name and/or password is invalid.  Please retry.${CLEARFORMAT}  "
 				else
 					break
 				fi
