@@ -749,6 +749,7 @@ Credentials(){
 			if [ "$exitmenu" != "exit" ]; then
 				sed -i 's/^LOGINNAME.*$/LOGINNAME='"$loginname"'/' "$SCRIPT_CONF"
 				echo $password | openssl enc -aes-256-cbc -md sha512 -a -pbkdf2 -iter 100000 -salt -pass pass:'RMerlin.iza.Wizard!' > .secret_vault.txt
+				chmod 0600 ".secret_vault.txt"
 				return 0
 			else
 				printf "\\n"
