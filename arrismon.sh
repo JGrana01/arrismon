@@ -758,8 +758,10 @@ Credentials(){
 		;;
 		check)
 			loginname=$(grep "LOGINNAME" "$SCRIPT_CONF" | cut -f2 -d"=")
-			gibberish=$(cat .secret_vault.txt)
-			echo "$gibberish" | openssl enc -aes-256-cbc -md sha512 -a -d -pbkdf2 -iter 100000 -salt -pass pass:'RMerlin.iza.Wizard!' > $password
+			if [ "$loginname" != "*NA" ]; then
+				gibberish=$(cat .secret_vault.txt)
+				echo "$gibberish" | openssl enc -aes-256-cbc -md sha512 -a -d -pbkdf2 -iter 100000 -salt -pass pass:'RMerlin.iza.Wizard!' > $password
+			fi	
 			echo "$loginname"
 		;;
 	esac
@@ -868,10 +870,10 @@ Get_Modem_Stats(){
 # todo for another day
 
 	loginname=$(grep "LOGINNAME" "$SCRIPT_CONF" | cut -f2 -d"=")
-	gibberish=$(cat .secret_vault.txt)
-	echo "$gibberish" | openssl enc -aes-256-cbc -md sha512 -a -d -pbkdf2 -iter 100000 -salt -pass pass:'RMerlin.iza.Wizard!' > $password
 	
 	if [ "$loginname" != "*NA" ]; then
+		gibberish=$(cat .secret_vault.txt)
+		echo "$gibberish" | openssl enc -aes-256-cbc -md sha512 -a -d -pbkdf2 -iter 100000 -salt -pass pass:'RMerlin.iza.Wizard!' > $password
 		/usr/sbin/curl "http://192.168.100.1/goform/login" -H "Content-Type: application/x-www-form-urlencoded" --data "loginUsername=$loginname&loginPassword=$password"
 	fi
 	
