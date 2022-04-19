@@ -354,7 +354,7 @@ Conf_Exists(){
 		fi
 		return 0
 	else
-		{ echo "OUTPUTDATAMODE=average"; echo "OUTPUTTIMEMODE=unix"; echo "STORAGELOCATION=jffs"; echo "SHOWNOTICE=false"; echo "DAYSTOKEEP=30"; echo "LOGINNAME=*NA"; echo "PASSWORD=*NA"; } > "$SCRIPT_CONF"
+		{ echo "OUTPUTDATAMODE=average"; echo "OUTPUTTIMEMODE=unix"; echo "STORAGELOCATION=jffs"; echo "SHOWNOTICE=false"; echo "DAYSTOKEEP=30"; echo "LOGINNAME=*NA"; } > "$SCRIPT_CONF"
 		return 1
 	fi
 }
@@ -707,7 +707,7 @@ Credentials(){
 		update)
 			ScriptHeader
 			loginname="*NA"
-			password="*NA"
+			password=""
 			exitmenu=""
 			
 			while true; do
@@ -740,7 +740,7 @@ Credentials(){
 				/usr/sbin/curl -v "http://192.168.100.1/goform/login" --data "loginUsername=$loginname&loginPassword=$password" 2> /tmp/checkcreds.txt
 				if [ "$(grep -c "login.asp" "/tmp/checkcreds.txt")" -gt 0 ]; then
 					printf "\\n"	
-					printf "\\n${WARN}Login name and/or password is invalid.  Please retry.${CLEARFORMAT}  "
+					printf "\\n${ERR}Login name and/or password is invalid.  Please retry.${CLEARFORMAT}  "
 				else
 					break
 				fi
@@ -867,7 +867,8 @@ Get_Modem_Stats(){
 # todo for another day
 
 	loginname=$(grep "LOGINNAME" "$SCRIPT_CONF" | cut -f2 -d"=")
-	password=$(grep "PASSWORD" "$SCRIPT_CONF" | cut -f2 -d"=")
+	gibberish=$(cat .secret_vault.txt)
+	echo "$gibberish" | openssl enc -aes-256-cbc -md sha512 -a -d -pbkdf2 -iter 100000 -salt -pass pass:'RMerlin.iza.Wizard!' > $password
 	
 	if [ "$loginname" != "*NA" ]; then
 		/usr/sbin/curl "http://192.168.100.1/goform/login" -H "Content-Type: application/x-www-form-urlencoded" --data "loginUsername=$loginname&loginPassword=$password"
