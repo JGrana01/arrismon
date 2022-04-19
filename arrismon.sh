@@ -740,7 +740,7 @@ Credentials(){
 				/usr/sbin/curl -v "http://192.168.100.1/goform/login" --data "loginUsername=$loginname&loginPassword=$password" 2> /tmp/checkcreds.txt
 				if [ "$(grep -c "login.asp" "/tmp/checkcreds.txt")" -gt 0 ]; then
 					printf "\\n"	
-					printf "\\n${BOLD}Login name and/or password is invalid.  Please retry.${CLEARFORMAT}  "
+					printf "\\n${WARN}Login name and/or password is invalid.  Please retry.${CLEARFORMAT}  "
 				else
 					break
 				fi
@@ -749,9 +749,6 @@ Credentials(){
 			if [ "$exitmenu" != "exit" ]; then
 				sed -i 's/^LOGINNAME.*$/LOGINNAME='"$loginname"'/' "$SCRIPT_CONF"
 				echo $password | openssl enc -aes-256-cbc -md sha512 -a -pbkdf2 -iter 100000 -salt -pass pass:'RMerlin.iza.Wizard!' > .secret_vault.txt
-				password="$(cat .secret_vault.txt)"
-				printf $password
-				sed -i 's/^PASSWORD.*$/PASSWORD='"$password"'/' "$SCRIPT_CONF"
 				return 0
 			else
 				printf "\\n"
@@ -760,7 +757,8 @@ Credentials(){
 		;;
 		check)
 			loginname=$(grep "LOGINNAME" "$SCRIPT_CONF" | cut -f2 -d"=")
-			password=$(grep "PASSWORD" "$SCRIPT_CONF" | cut -f2 -d"=")
+			gibberish=$(cat .secret_vault.txt)
+			echo "$gibberish" | openssl enc -aes-256-cbc -md sha512 -a -d -pbkdf2 -iter 100000 -salt -pass pass:'RMerlin.iza.Wizard!' > $password
 			echo "$loginname"
 		;;
 	esac
