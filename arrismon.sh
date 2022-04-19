@@ -705,14 +705,15 @@ DaysToKeep(){
 Credentials(){
 	case "$1" in
 		update)
+			ScriptHeader
+			loginname="*NA"
+			password="*NA"
+			exitmenu=""
+			
 			while true; do
-				loginname="*NA"
-				password="*NA"
-				exitmenu=""
 				loginname_inp=""
 				password_inp=""
-			
-				ScriptHeader
+
 				printf "\\n${BOLD}Please enter the login name for your cable modem:${CLEARFORMAT}  "
 			
 				read -r loginname_inp
@@ -737,7 +738,6 @@ Credentials(){
 				
 				rm -f "/tmp/checkcreds.txt" 2>/dev/null
 				/usr/sbin/curl -v "http://192.168.100.1/goform/login" --data "loginUsername=$loginname&loginPassword=$password" 2> /tmp/checkcreds.txt
-		##		/usr/sbin/curl -v "http://192.168.100.1/goform/login" --data "loginUsername=admin&loginPassword=CableBox#8" 2> /tmp/checkcreds.txt
 				if [ "$(grep -c "login.asp" "/tmp/checkcreds.txt")" -gt 0 ]; then
 					printf "\\n"	
 					printf "\\n${BOLD}Login name and/or password is invalid.  Please retry.${CLEARFORM}  "
