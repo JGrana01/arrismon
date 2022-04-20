@@ -751,10 +751,10 @@ Credentials(){
 			if [ "$exitmenu" != "exit" ]; then
 				sed -i 's/^LOGINNAME.*$/LOGINNAME='"$loginname"'/' "$SCRIPT_CONF"
 				if [ "$loginname" != "*NA" ]; then
-					echo $password | openssl enc -aes-256-cbc -md sha512 -a -pbkdf2 -iter 100000 -salt -pass pass:'RMerlin.iza.Wizard!' > $SCRIPT_STORAGE_DIR.secret_vault.txt
-					chmod 0600 "$SCRIPT_STORAGE_DIR.secret_vault.txt"
+					echo $password | openssl enc -aes-256-cbc -md sha512 -a -pbkdf2 -iter 100000 -salt -pass pass:'RMerlin.iza.Wizard!' > $SCRIPT_STORAGE_DIR/.secret_vault.txt
+					chmod 0600 "$SCRIPT_STORAGE_DIR/.secret_vault.txt"
 				else
-					rm -f "$SCRIPT_STORAGE_DIR.secret_vault.txt" 2>/dev/null
+					rm -f "$SCRIPT_STORAGE_DIR/.secret_vault.txt" 2>/dev/null
 				fi
 				return 0
 			else
@@ -765,7 +765,7 @@ Credentials(){
 		check)
 			loginname=$(grep "LOGINNAME" "$SCRIPT_CONF" | cut -f2 -d"=")
 			if [ "$loginname" != "*NA" ]; then
-				gibberish=$(cat $SCRIPT_STORAGE_DIR.secret_vault.txt)
+				gibberish=$(cat $SCRIPT_STORAGE_DIR/.secret_vault.txt)
 				password=$(echo "$gibberish" | openssl enc -aes-256-cbc -md sha512 -a -d -pbkdf2 -iter 100000 -salt -pass pass:'RMerlin.iza.Wizard!')
 			fi	
 			echo "$loginname"
@@ -878,7 +878,7 @@ Get_Modem_Stats(){
 	loginname=$(grep "LOGINNAME" "$SCRIPT_CONF" | cut -f2 -d"=")
 	
 	if [ "$loginname" != "*NA" ]; then
-		gibberish=$(cat $SCRIPT_STORAGE_DIR.secret_vault.txt)
+		gibberish=$(cat $SCRIPT_STORAGE_DIR/.secret_vault.txt)
 		password=$(echo "$gibberish" | openssl enc -aes-256-cbc -md sha512 -a -d -pbkdf2 -iter 100000 -salt -pass pass:'RMerlin.iza.Wizard!')
 		/usr/sbin/curl "http://192.168.100.1/goform/login" -H "Content-Type: application/x-www-form-urlencoded" --data "loginUsername=$loginname&loginPassword=$password"
 	fi
