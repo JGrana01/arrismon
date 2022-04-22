@@ -5,6 +5,8 @@
 ##                      arrismon.sh                       ##
 ##                                                        ##
 ##           https://github.com/JGrana01/arrismon         ##
+##           https://github.com/WRKDBF-Guy/arrismon       ##
+##                  forked from @JacYaz                   ##
 ##                                                        ##
 ############################################################
 
@@ -20,7 +22,7 @@
 
 ### Start of script variables ###
 readonly SCRIPT_NAME="arrismon"
-readonly SCRIPT_VERSION="v0.2.1-beta"
+readonly SCRIPT_VERSION="v0.3.1-beta"
 SCRIPT_BRANCH="master"
 SCRIPT_REPO="https://raw.githubusercontent.com/JGrana01/$SCRIPT_NAME/$SCRIPT_BRANCH"
 readonly SCRIPT_DIR="/jffs/addons/$SCRIPT_NAME.d"
@@ -1344,7 +1346,10 @@ ScriptHeader(){
 	printf "${BOLD}##                   arrismon                          ##${CLEARFORMAT}\\n"
 	printf "${BOLD}##                                                     ##${CLEARFORMAT}\\n"
 	printf "${BOLD}##        https://github.com/JGrana01/arrismon         ##${CLEARFORMAT}\\n"
+	printf "${BOLD}##        https://github.com/WRKDBF-Guy/arrismon       ##${CLEARFORMAT}\\n"
 	printf "${BOLD}##                                                     ##${CLEARFORMAT}\\n"
+	printf "${BOLD}##                                                     ##${CLEARFORMAT}\\n"
+	printf "${BOLD}##    Forked from https://github.com/jackyaz/modmon    ##${CLEARFORMAT}\\n"
 	printf "${BOLD}##                $SCRIPT_VERSION                          ##${CLEARFORMAT}\\n"
 	printf "${BOLD}#########################################################${CLEARFORMAT}\\n"
 	printf "\\n"
@@ -1565,7 +1570,8 @@ Check_Requirements(){
 
 Menu_Install(){
 	ScriptHeader
-	Print_Output true "Welcome to $SCRIPT_NAME $SCRIPT_VERSION, a script by JGrana01"
+	Print_Output true "Welcome to $SCRIPT_NAME $SCRIPT_VERSION, a script by JGrana01 and WRKDBF-Guy"
+	Print_Output true "               a fork of JakYaz original modmon Addon"
 	sleep 1
 	
 	Print_Output false "Checking your router meets the requirements for $SCRIPT_NAME"
@@ -1778,6 +1784,7 @@ Available commands:
   $SCRIPT_NAME uninstall          uninstalls script
   $SCRIPT_NAME generate           get modem stats and logs. also runs outputcsv
   $SCRIPT_NAME outputcsv          create CSVs from database, used by WebUI and export
+  $SCRIPT_NAME credentials        create or update login informatio for modem
   $SCRIPT_NAME develop            switch to development branch
   $SCRIPT_NAME stable             switch to stable branch
 EOF
@@ -1882,6 +1889,10 @@ case "$1" in
 	;;
 	checkupdate)
 		Update_Check
+		exit 0
+	;;
+	credentials)
+		Credentials update
 		exit 0
 	;;
 	uninstall)
