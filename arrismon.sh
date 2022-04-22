@@ -5,7 +5,7 @@
 ##                      arrismon.sh                       ##
 ##                                                        ##
 ##           https://github.com/JGrana01/arrismon         ##
-##           https://github.com/WRKDBF-Guy/arrismon       ##
+##          https://github.com/WRKDBF-Guy/arrismon        ##
 ##                  forked from @JacYaz                   ##
 ##                                                        ##
 ############################################################
@@ -788,10 +788,14 @@ Credentials(){
 		;;
 		check)
 			loginname=$(grep "LOGINNAME" "$SCRIPT_CONF" | cut -f2 -d"=")
-			if [ "$loginname" != "*NA" ]; then
-				gibberish=$(cat "$SCRIPT_STORAGE_DIR"/.secret_vault.txt)
-				password=$(echo "$gibberish" | openssl enc -aes-256-cbc -md sha512 -a -d -pbkdf2 -iter 100000 -salt -pass pass:'RMerlin.iza.Wizard!')
-			fi	
+			if [ -f "$SCRIPT_STORAGE_DIR"/.secret_vault.txt ]; then
+				if [ "$loginname" != "*NA" ]; then
+					gibberish=$(cat "$SCRIPT_STORAGE_DIR"/.secret_vault.txt)
+					password=$(echo "$gibberish" | openssl enc -aes-256-cbc -md sha512 -a -d -pbkdf2 -iter 100000 -salt -pass pass:'RMerlin.iza.Wizard!')
+				fi	
+			else
+					loginname="*NA"
+			fi
 			echo "$loginname"
 		;;
 	esac
