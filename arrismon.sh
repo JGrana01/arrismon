@@ -21,10 +21,8 @@
 ### Start of script variables ###
 readonly SCRIPT_NAME="arrismon"
 readonly SCRIPT_VERSION="v0.2.1-beta"
-## SCRIPT_BRANCH="master"
-SCRIPT_BRANCH="Credentials"
-## SCRIPT_REPO="https://raw.githubusercontent.com/JGrana01/$SCRIPT_NAME/$SCRIPT_BRANCH"
-SCRIPT_REPO="https://raw.githubusercontent.com/WRKDBF-Guy/$SCRIPT_NAME/$SCRIPT_BRANCH"
+SCRIPT_BRANCH="master"
+SCRIPT_REPO="https://raw.githubusercontent.com/JGrana01/$SCRIPT_NAME/$SCRIPT_BRANCH"
 readonly SCRIPT_DIR="/jffs/addons/$SCRIPT_NAME.d"
 readonly SCRIPT_WEBPAGE_DIR="$(readlink /www/user)"
 readonly SCRIPT_WEB_DIR="$SCRIPT_WEBPAGE_DIR/$SCRIPT_NAME"
@@ -219,6 +217,30 @@ Update_Version(){
 		exit 0
 	fi
 }
+
+
+Update_Corr(){
+
+		if [ $2 == 0 ] && [ ! -f "$SCRIPT_DIR/$1.$3" ]; then
+			newcorr=0
+			return
+		fi
+		if [ ! -f "$SCRIPT_DIR/$1.$3" ]; then
+			echo 0 > "$SCRIPT_DIR/$1.$3"
+		fi
+		oldcorr="$(cat "$SCRIPT_DIR/$1.$3")"
+
+# carefull - arris reset counters!
+
+		if [ "$2" == 0 ]; then
+			newcorr=0
+		else
+			newcorr=$(($2-oldcorr))	
+		fi
+# keep the value modem presents
+		echo $2 > "$SCRIPT_DIR/$1.$3"
+}
+
 
 Update_File(){
 	if [ "$1" = "arrismonstats_www.asp" ]; then
@@ -956,10 +978,14 @@ fi
 									   measurement="$(grep "$metric"   $shstatsfile | sed "$counter!d" | cut -d',' -f7)"
 					;;
 					"RxCorr")
-									   measurement="$(grep "$metric"   $shstatsfile | sed "$counter!d" | cut -d',' -f13)"
+									   modemcorr="$(grep "$metric"   $shstatsfile | sed "$counter!d" | cut -d',' -f13)"
+									   Update_Corr RxCorr $modemcorr $counter
+									   measurement=$newcorr
 					;;
 					"RxUncor")
-									   measurement="$(grep "$metric"   $shstatsfile | sed "$counter!d" | cut -d',' -f15)"
+									   modemcorr="$(grep "$metric"   $shstatsfile | sed "$counter!d" | cut -d',' -f15)"
+									   Update_Corr RxUncor $modemcorr $counter
+									   measurement=$newcorr
 					;;
 					"SymRate")
 									   measurement="$(grep "$metric"   $shstatsfile | sed "$counter!d" | cut -d',' -f7)"
@@ -1319,6 +1345,7 @@ ScriptHeader(){
 	printf "${BOLD}##                                                     ##${CLEARFORMAT}\\n"
 	printf "${BOLD}##        https://github.com/JGrana01/arrismon         ##${CLEARFORMAT}\\n"
 	printf "${BOLD}##                                                     ##${CLEARFORMAT}\\n"
+	printf "${BOLD}##                $SCRIPT_VERSION                          ##${CLEARFORMAT}\\n"
 	printf "${BOLD}#########################################################${CLEARFORMAT}\\n"
 	printf "\\n"
 }
