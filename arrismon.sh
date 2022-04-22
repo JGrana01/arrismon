@@ -376,7 +376,7 @@ Conf_Exists(){
 		fi
 		return 0
 	else
-		{ echo "OUTPUTDATAMODE=average"; echo "OUTPUTTIMEMODE=unix"; echo "STORAGELOCATION=jffs"; echo "SHOWNOTICE=false"; echo "DAYSTOKEEP=30"; } > "$SCRIPT_CONF"
+		{ echo "OUTPUTDATAMODE=average"; echo "OUTPUTTIMEMODE=unix"; echo "STORAGELOCATION=jffs"; echo "SHOWNOTICE=false"; echo "DAYSTOKEEP=30"; echo "LOGINNAME=*NA"; } > "$SCRIPT_CONF"
 		return 1
 	fi
 }
@@ -589,6 +589,7 @@ ScriptStorageLocation(){
 			mv "/jffs/addons/$SCRIPT_NAME.d/csv" "/opt/share/$SCRIPT_NAME.d/" 2>/dev/null
 			mv "/jffs/addons/$SCRIPT_NAME.d/config" "/opt/share/$SCRIPT_NAME.d/" 2>/dev/null
 			mv "/jffs/addons/$SCRIPT_NAME.d/config.bak" "/opt/share/$SCRIPT_NAME.d/" 2>/dev/null
+			mv "/jffs/addons/$SCRIPT_NAME.d/.secret_vault.txt" "/opt/share/$SCRIPT_NAME.d/" 2>/dev/null
 			mv "/jffs/addons/$SCRIPT_NAME.d/modstatstext.js" "/opt/share/$SCRIPT_NAME.d/" 2>/dev/null
 			mv "/jffs/addons/$SCRIPT_NAME.d/modstats.db" "/opt/share/$SCRIPT_NAME.d/" 2>/dev/null
 			mv "/jffs/addons/$SCRIPT_NAME.d/.indexcreated" "/opt/share/$SCRIPT_NAME.d/" 2>/dev/null
@@ -601,6 +602,7 @@ ScriptStorageLocation(){
 			mv "/opt/share/$SCRIPT_NAME.d/csv" "/jffs/addons/$SCRIPT_NAME.d/" 2>/dev/null
 			mv "/opt/share/$SCRIPT_NAME.d/config" "/jffs/addons/$SCRIPT_NAME.d/" 2>/dev/null
 			mv "/opt/share/$SCRIPT_NAME.d/config.bak" "/jffs/addons/$SCRIPT_NAME.d/" 2>/dev/null
+			mv "/opt/share/$SCRIPT_NAME.d/.secret_vault.txt" "/jffs/addons/$SCRIPT_NAME.d/" 2>/dev/null
 			mv "/opt/share/$SCRIPT_NAME.d/modstatstext.js" "/jffs/addons/$SCRIPT_NAME.d/" 2>/dev/null
 			mv "/opt/share/$SCRIPT_NAME.d/modstats.db" "/jffs/addons/$SCRIPT_NAME.d/" 2>/dev/null
 			mv "/opt/share/$SCRIPT_NAME.d/.indexcreated" "/jffs/addons/$SCRIPT_NAME.d/" 2>/dev/null
@@ -724,6 +726,76 @@ DaysToKeep(){
 	esac
 }
 
+Credentials(){
+	case "$1" in
+		update)
+			ScriptHeader
+			loginname="*NA"
+			password=""
+			exitmenu=""
+			
+			while true; do
+				loginname_inp=""
+				password_inp=""
+
+				printf "\\n${BOLD}Please enter the login name for your cable modem:${CLEARFORMAT}  "
+			
+				read -r loginname_inp
+				if [ "$loginname_inp" = "e" ]; then
+					exitmenu="exit"
+					break
+				fi
+				
+				loginname="$loginname_inp"
+				printf "\\n"	
+				printf "\\n${BOLD}Please enter the password for your cable modem:${CLEARFORMAT}  "
+				
+				stty -echo
+				read -r password_inp
+				stty echo
+				if [ "$password_inp" = "e" ]; then
+					exitmenu="exit"
+					break
+				fi
+				password="$password_inp"
+				printf "\\n"
+				
+				rm -f "/tmp/checkcreds.txt" 2>/dev/null
+				/usr/sbin/curl -v "http://192.168.100.1/goform/login" --data "loginUsername=$loginname&loginPassword=$password" 2> /tmp/checkcreds.txt
+				if [ "$(grep -c "login.asp" "/tmp/checkcreds.txt")" -gt 0 ]; then
+					printf "\\n"	
+					printf "\\n${ERR}Login name and/or password is invalid.  Please retry.${CLEARFORMAT}  "
+				else
+					break
+				fi
+			done
+			
+			if [ "$exitmenu" != "exit" ]; then
+				sed -i 's/^LOGINNAME.*$/LOGINNAME='"$loginname"'/' "$SCRIPT_CONF"
+				if [ "$loginname" != "*NA" ]; then
+					echo $password | openssl enc -aes-256-cbc -md sha512 -a -pbkdf2 -iter 100000 -salt -pass pass:'RMerlin.iza.Wizard!' > $SCRIPT_STORAGE_DIR/.secret_vault.txt
+					chmod 0600 "$SCRIPT_STORAGE_DIR/.secret_vault.txt"
+				else
+					rm -f "$SCRIPT_STORAGE_DIR/.secret_vault.txt" 2>/dev/null
+				fi
+				return 0
+			else
+				printf "\\n"
+				return 1
+			fi
+		;;
+		check)
+			loginname=$(grep "LOGINNAME" "$SCRIPT_CONF" | cut -f2 -d"=")
+			if [ "$loginname" != "*NA" ]; then
+				gibberish=$(cat "$SCRIPT_STORAGE_DIR"/.secret_vault.txt)
+				password=$(echo "$gibberish" | openssl enc -aes-256-cbc -md sha512 -a -d -pbkdf2 -iter 100000 -salt -pass pass:'RMerlin.iza.Wizard!')
+			fi	
+			echo "$loginname"
+		;;
+	esac
+}
+
+
 WriteStats_ToJS(){
 	echo "function $3(){" > "$2"
 	html='document.getElementById("'"$4"'").innerHTML="'
@@ -825,20 +897,25 @@ Get_Modem_Stats(){
 # sorry about the intermediate tmp files - fear of lines to long
 # todo for another day
 
-
+	loginname=$(grep "LOGINNAME" "$SCRIPT_CONF" | cut -f2 -d"=")
+	
+	if [ "$loginname" != "*NA" ]; then
+		gibberish=$(cat $SCRIPT_STORAGE_DIR/.secret_vault.txt)
+		password=$(echo "$gibberish" | openssl enc -aes-256-cbc -md sha512 -a -d -pbkdf2 -iter 100000 -salt -pass pass:'RMerlin.iza.Wizard!')
+		/usr/sbin/curl "http://192.168.100.1/goform/login" -H "Content-Type: application/x-www-form-urlencoded" --data "loginUsername=$loginname&loginPassword=$password"
+	fi
+	
 	/usr/sbin/curl -fs --retry 3 --connect-timeout 20 'http://192.168.100.1/RgConnect.asp' -H 'User-Agent: Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:98.0) Gecko/20100101 Firefox/98.0' -H 'Accept: */*' -H 'X-CSRF-TOKEN: 7d298d27f7ede0df78c9292cdca2cd57' -H 'X-Requested-With: XMLHttpRequest' -H 'Connection: keep-alive' -H 'Cookie: lang=fr; PHPSESSID=9csugaomqu52rqc6vgul600b91; auth=7d298d27f7ede0df78c9292cdca2cd57'  > "$shstatsfile_curl"
 
 # sed and awk away...(btw, need the strings pipe so grep believes its simply a text file)
 
 # Processing the Rx, DownStream
 
-#sed 's///g' "$shstatsfile_curl" | strings | grep QAM | sed 's%<tr><td>%%g' | sed 's%</td><t[dr]>%,%g' | sed 's%</td></tr>%%g' > "$shstatsfile_dsttmp"
 sed 's/\r//g' "$shstatsfile_curl" | strings | grep QAM | sed 's%<tr><td>%%g' | sed 's%</td><t[dr]>%,%g' | sed 's%</td></tr>%%g' > "$shstatsfile_dsttmp"
 awk -F, '{printf("%d,%d,%d,RxChannelID,%d,RxFreq,%d,RxPwr,%d,RxSnr,%d,RxCorr,%d,RxUncor,%d\n", $1, $2, $3, $4, $5, $6, $7, $8, $9)}' "$shstatsfile_dsttmp" > "$shstatsfile_dst"
 
 # Processing the TX, UpStream
 
-#sed 's///g' "$shstatsfile_curl" | strings | grep ATDMA | sed 's%<tr><td>%%g' | sed 's%</td><t[dr]>%,%g' | sed 's%</td></tr>%%g' > "$shstatsfile_usttmp"
 sed 's/\r//g' "$shstatsfile_curl" | strings | grep ATDMA | sed 's%<tr><td>%%g' | sed 's%</td><t[dr]>%,%g' | sed 's%</td></tr>%%g' > "$shstatsfile_usttmp"
 awk -F, '{printf("%d,%d,%d,TxChannelID,%d,SymRate,%d,TxFreq,%d,TxPwr,%d\n", $1, $2, $3, $4, $5, $6, $7 )}' "$shstatsfile_usttmp" > "$shstatsfile_ust"
 
@@ -1159,7 +1236,7 @@ Generate_Modem_Logs(){
 	fi
 
 	for i in $loglist ; do
-		sed 's///g' "$shstatsfile_logtbl" | strings | grep $i | sed 's%</td><td width="87">%%g' | sed 's%<td width="169">%%g' | sed 's%</td><td width="450">%,%g' | sed 's%</td>%%g' >> "$shstatsfile_logtmp"
+		sed 's/\r//g' "$shstatsfile_logtbl" | strings | grep $i | sed 's%</td><td width="87">%%g' | sed 's%<td width="169">%%g' | sed 's%</td><td width="450">%,%g' | sed 's%</td>%%g' >> "$shstatsfile_logtmp"
 	done
 
 # annoyningly Arris doesn't timestamp each log messages. They are clustered and Im still trying to figure out how to deal with this
@@ -1281,6 +1358,7 @@ MainMenu(){
 	printf "4.    Set number of days data to keep in database\\n      Currently: ${SETTING}%s days data will be kept${CLEARFORMAT}\\n\\n" "$(DaysToKeep check)"
 	printf "s.    Toggle storage location for stats and config\\n      Current location is ${SETTING}%s${CLEARFORMAT} \\n\\n" "$(ScriptStorageLocation check)"
 	printf "n.    Toggle Show Notice messages from modem logs (Critical and Error always shown)\\n      Currently: ${SETTING}%s${CLEARFORMAT} \\n\\n" "$(ShowNotice check)"
+	printf "c.    Credentials: enter login name & password if required for your cable modem (optional)\\n      Currently: ${SETTING}%s${CLEARFORMAT} \\n\\n" "$(Credentials check)"
 	printf "u.    Check for updates\\n"
 	printf "uf.   Update %s with latest version (force update)\\n\\n" "$SCRIPT_NAME"
 	printf "r.    Reset %s database / delete all data\\n\\n" "$SCRIPT_NAME"
@@ -1337,6 +1415,12 @@ MainMenu(){
 					ScriptStorageLocation jffs
 					Create_Symlinks
 				fi
+				break
+			;;
+			c)
+				printf "\\n"
+				Credentials update
+				PressEnter
 				break
 			;;
 			u)
@@ -1469,7 +1553,7 @@ Check_Requirements(){
 	if [ "$CHECKSFAILED" = "false" ]; then
 		Print_Output false "Installing required packages from Entware" "$PASS"
 		opkg update
-		opkg install sqlite3-cli
+	##	opkg install sqlite3-cli
 		opkg install p7zip
 		opkg install coreutils-paste
 		opkg install findutils
