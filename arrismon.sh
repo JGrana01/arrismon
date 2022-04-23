@@ -6,7 +6,7 @@
 ##                                                        ##
 ##           https://github.com/JGrana01/arrismon         ##
 ##          https://github.com/WRKDBF-Guy/arrismon        ##
-##                  forked from @JacYaz                   ##
+##                  forked from @JackYaz                  ##
 ##                                                        ##
 ############################################################
 
@@ -22,7 +22,7 @@
 
 ### Start of script variables ###
 readonly SCRIPT_NAME="arrismon"
-readonly SCRIPT_VERSION="v0.3.1-beta"
+readonly SCRIPT_VERSION="v0.3.2-beta"
 SCRIPT_BRANCH="master"
 SCRIPT_REPO="https://raw.githubusercontent.com/JGrana01/$SCRIPT_NAME/$SCRIPT_BRANCH"
 readonly SCRIPT_DIR="/jffs/addons/$SCRIPT_NAME.d"
@@ -375,6 +375,9 @@ Conf_Exists(){
 		sed -i -e 's/"//g' "$SCRIPT_CONF"
 		if ! grep -q "DAYSTOKEEP" "$SCRIPT_CONF"; then
 			echo "DAYSTOKEEP=30" >> "$SCRIPT_CONF"
+		fi
+		if ! grep -q "LOGINNAME" "$SCRIPT_CONF"; then
+			echo "LOGINNAME=*NA" >> "$SCRIPT_CONF"
 		fi
 		return 0
 	else
@@ -788,14 +791,10 @@ Credentials(){
 		;;
 		check)
 			loginname=$(grep "LOGINNAME" "$SCRIPT_CONF" | cut -f2 -d"=")
-			if [ -f "$SCRIPT_STORAGE_DIR"/.secret_vault.txt ]; then
-				if [ "$loginname" != "*NA" ]; then
-					gibberish=$(cat "$SCRIPT_STORAGE_DIR"/.secret_vault.txt)
-					password=$(echo "$gibberish" | openssl enc -aes-256-cbc -md sha512 -a -d -pbkdf2 -iter 100000 -salt -pass pass:'RMerlin.iza.Wizard!')
-				fi	
-			else
-					loginname="*NA"
-			fi
+			if [ "$loginname" != "*NA" ]; then
+				gibberish=$(cat "$SCRIPT_STORAGE_DIR"/.secret_vault.txt)
+				password=$(echo "$gibberish" | openssl enc -aes-256-cbc -md sha512 -a -d -pbkdf2 -iter 100000 -salt -pass pass:'RMerlin.iza.Wizard!')
+			fi	
 			echo "$loginname"
 		;;
 	esac
