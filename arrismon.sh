@@ -37,7 +37,6 @@ readonly SHARED_WEB_DIR="$SCRIPT_WEBPAGE_DIR/shared-jy"
 # useful debug output when necessary
 # Do NOT enable when invoked by cru - it will block
 debug="false"
-reseterrorct="Y"
 
 ### End of script variables ###
 
@@ -237,8 +236,40 @@ Update_MdmErrors(){
 		else
 			newcorr=$(($2-oldcorr))	
 		fi
-		sed -i "s/^$3,.*/$3,$newcorr/g" "$SCRIPT_DIR/modem$1"
+		sed -i "s/^$3,.*/$3,$newcorr,$2/g" "$SCRIPT_DIR/modem$1"
 }
+
+Display_MdmErrors(){
+
+
+# First display correctables
+
+
+	printf "\\n${BOLD}Correctable Errors\\n${CLEARFORMAT} "
+	printf "\\n${BOLD}Channel	Latest		Historic\\n${CLEARFORMAT} "
+	channelcnt="$(wc -l < "$SCRIPT_DIR/modemRxCorr" )"
+ 	counter=1
+		until [ $counter -gt "$channelcnt" ]; do
+			latest="$(grep "^$counter," "$SCRIPT_DIR/modemRxCorr" | awk -F "," '{print $2}')"
+			historic="$(grep "^$counter," "$SCRIPT_DIR/modemRxCorr" | awk -F "," '{print $3}')"
+			printf "$counter	  $latest		  $historic\\n"
+			counter=$((counter + 1))	
+		done
+	printf "\\n\\n"
+        printf "\\n${BOLD}UnCorrectable Errors\\n${CLEARFORMAT} "
+        printf "\\n${BOLD}Channel       Latest          Historic\\n${CLEARFORMAT} "
+        channelcnt="$(wc -l < "$SCRIPT_DIR/modemRxUncor" )"
+        counter=1
+                until [ $counter -gt "$channelcnt" ]; do
+                        latest="$(grep "^$counter," "$SCRIPT_DIR/modemRxUncor" | awk -F "," '{print $2}')"
+                        historic="$(grep "^$counter," "$SCRIPT_DIR/modemRxUncor" | awk -F "," '{print $3}')"
+                        printf "$counter          $latest                 $historic\\n"
+                        counter=$((counter + 1))
+                done
+        printf "\\n\\n"
+	PressEnter
+}
+
 
 
 Update_File(){
@@ -856,8 +887,6 @@ Get_Modem_Stats(){
 	Auto_ServiceEvent create 2>/dev/null
 	Shortcut_Script create
 	reseterrorct=$(grep "RESETERRORCT" "$SCRIPT_CONF" | cut -f2 -d"=")
-	echo -n "Reset Error: "
-	echo $reseterrorct
 	TZ=$(cat /etc/TZ)
 	export TZ
 	timenow="$(date '+%s')"
@@ -1490,6 +1519,10 @@ MainMenu(){
 					;;
 					esac
                                 sed -i 's/^RESETERRORCT.*$/RESETERRORCT='"$reseterrorct"'/' "$SCRIPT_CONF"
+				break
+			;;
+			ed)
+				Display_MdmErrors
 				break
 			;;
 			dbon)
