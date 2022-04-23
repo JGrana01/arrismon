@@ -37,6 +37,7 @@ readonly SHARED_WEB_DIR="$SCRIPT_WEBPAGE_DIR/shared-jy"
 # useful debug output when necessary
 # Do NOT enable when invoked by cru - it will block
 debug="false"
+reseterrorct="Y"
 
 ### End of script variables ###
 
@@ -220,27 +221,23 @@ Update_Version(){
 	fi
 }
 
-
-Update_Corr(){
-
-		if [ $2 == 0 ] && [ ! -f "$SCRIPT_DIR/$1.$3" ]; then
-			newcorr=0
-			return
+Update_MdmErrors(){
+		if [ ! -f $SCRIPT_DIR/modem$1 ]; then
+			touch $SCRIPT_DIR/modem$1
 		fi
-		if [ ! -f "$SCRIPT_DIR/$1.$3" ]; then
-			echo 0 > "$SCRIPT_DIR/$1.$3"
-		fi
-		oldcorr="$(cat "$SCRIPT_DIR/$1.$3")"
 
-# carefull - arris reset counters!
+		grep -q "^$3," "$SCRIPT_DIR/modem$1" || echo "$3,0" >> "$SCRIPT_DIR/modem$1"
+
+		oldcorr="$(grep "^$3," "$SCRIPT_DIR/modem$1" | awk -F "," '{print $2}')"
+
+# carefull - arris reset counters! So, subtract the old value to reset
 
 		if [ "$2" == 0 ]; then
 			newcorr=0
 		else
 			newcorr=$(($2-oldcorr))	
 		fi
-# keep the value modem presents
-		echo $2 > "$SCRIPT_DIR/$1.$3"
+		sed -i "s/^$3,.*/$3,$newcorr/g" "$SCRIPT_DIR/modem$1"
 }
 
 
@@ -379,9 +376,13 @@ Conf_Exists(){
 		if ! grep -q "LOGINNAME" "$SCRIPT_CONF"; then
 			echo "LOGINNAME=*NA" >> "$SCRIPT_CONF"
 		fi
+		if ! grep -q "RESETERRORCT" "$SCRIPT_CONF"; then
+			echo "RESETERRORCT=Y" >> "$SCRIPT_CONF"
+		fi
 		return 0
 	else
-		{ echo "OUTPUTDATAMODE=average"; echo "OUTPUTTIMEMODE=unix"; echo "STORAGELOCATION=jffs"; echo "SHOWNOTICE=false"; echo "DAYSTOKEEP=30"; echo "LOGINNAME=*NA"; } > "$SCRIPT_CONF"
+		{ echo "OUTPUTDATAMODE=average"; echo "OUTPUTTIMEMODE=unix"; echo "STORAGELOCATION=jffs"; echo "SHOWNOTICE=false"; echo "DAYSTOKEEP=30"; echo "LOGINNAME=*NA"; echo "RESETERRORCT=Y"; } > "$SCRIPT_CONF"                                                                         
+
 		return 1
 	fi
 }
@@ -854,7 +855,9 @@ Get_Modem_Stats(){
 	Auto_Cron create 2>/dev/null
 	Auto_ServiceEvent create 2>/dev/null
 	Shortcut_Script create
-	
+	reseterrorct=$(grep "RESETERRORCT" "$SCRIPT_CONF" | cut -f2 -d"=")
+	echo -n "Reset Error: "
+	echo $reseterrorct
 	TZ=$(cat /etc/TZ)
 	export TZ
 	timenow="$(date '+%s')"
@@ -984,12 +987,12 @@ fi
 					;;
 					"RxCorr")
 									   modemcorr="$(grep "$metric"   $shstatsfile | sed "$counter!d" | cut -d',' -f13)"
-									   Update_Corr RxCorr $modemcorr $counter
+									   Update_MdmErrors RxCorr $modemcorr $counter
 									   measurement=$newcorr
 					;;
 					"RxUncor")
 									   modemcorr="$(grep "$metric"   $shstatsfile | sed "$counter!d" | cut -d',' -f15)"
-									   Update_Corr RxUncor $modemcorr $counter
+									   Update_MdmErrors RxUncor $modemcorr $counter
 									   measurement=$newcorr
 					;;
 					"SymRate")
@@ -1466,6 +1469,27 @@ MainMenu(){
 			l)
 				printf "\\n"
 				GetLog
+				break
+			;;
+			ec)
+				printf "\\n"
+				printf "Arris modems do not reset uncorrectable and correctable errors after reporting\\n"
+				printf "Arrismon can internally reset any error counts after reporting\\n"
+				printf "Reset errors after reporting is presently %s \\n " "$reseterrorct"
+				printf "\\n${BOLD}Do you want Arrismon to reset counters after reporting? (y/n)${CLEARFORMAT} "
+				read -r confirm
+				case "$confirm" in
+					y|Y)
+						reseterrorct="Y"
+					;;
+					n|N)
+						reseterrorct="N"
+					;;
+					*)
+						break
+					;;
+					esac
+                                sed -i 's/^RESETERRORCT.*$/RESETERRORCT='"$reseterrorct"'/' "$SCRIPT_CONF"
 				break
 			;;
 			dbon)
