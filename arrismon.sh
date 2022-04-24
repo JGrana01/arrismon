@@ -238,9 +238,11 @@ Update_MdmErrors(){
 		fi
 		sed -i "s/^$3,.*/$3,$2,$newcorr/g" "$SCRIPT_DIR/modem$1"
 
+if [ "$debug" = "true" ]; then
 		echo "Stats: "
 		echo -n "Channel $3  Oldcorr  $oldcorr  Newcorr  $newcorr  Modem  $2"
 		echo
+fi
 
 }
 
