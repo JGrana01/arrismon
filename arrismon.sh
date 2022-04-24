@@ -258,8 +258,8 @@ Display_MdmErrors(){
 	channelcnt="$(wc -l < "$SCRIPT_DIR/modemRxCorr" )"
  	counter=1
 		until [ $counter -gt "$channelcnt" ]; do
-			latest="$(grep "^$counter," "$SCRIPT_DIR/modemRxCorr" | awk -F "," '{print $2}')"
-			historic="$(grep "^$counter," "$SCRIPT_DIR/modemRxCorr" | awk -F "," '{print $3}')"
+			latest="$(grep "^$counter," "$SCRIPT_DIR/modemRxCorr" | awk -F "," '{print $3}')"
+			historic="$(grep "^$counter," "$SCRIPT_DIR/modemRxCorr" | awk -F "," '{print $2}')"
 			printf "$fmt" "$counter" "$latest" "$historic"
 			counter=$((counter + 1))	
 		done
@@ -269,8 +269,8 @@ Display_MdmErrors(){
         channelcnt="$(wc -l < "$SCRIPT_DIR/modemRxUncor" )"
         counter=1
                 until [ $counter -gt "$channelcnt" ]; do
-                        latest="$(grep "^$counter," "$SCRIPT_DIR/modemRxUncor" | awk -F "," '{print $2}')"
-                        historic="$(grep "^$counter," "$SCRIPT_DIR/modemRxUncor" | awk -F "," '{print $3}')"
+                        latest="$(grep "^$counter," "$SCRIPT_DIR/modemRxUncor" | awk -F "," '{print $3}')"
+                        historic="$(grep "^$counter," "$SCRIPT_DIR/modemRxUncor" | awk -F "," '{print $2}')"
 			printf "$fmt" "$counter" "$latest" "$historic"
                         counter=$((counter + 1))
                 done
