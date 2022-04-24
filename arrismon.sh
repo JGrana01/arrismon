@@ -22,7 +22,7 @@
 
 ### Start of script variables ###
 readonly SCRIPT_NAME="arrismon"
-readonly SCRIPT_VERSION="v0.3.2-beta"
+readonly SCRIPT_VERSION="v0.3.3-beta"
 SCRIPT_BRANCH="master"
 SCRIPT_REPO="https://raw.githubusercontent.com/JGrana01/$SCRIPT_NAME/$SCRIPT_BRANCH"
 readonly SCRIPT_DIR="/jffs/addons/$SCRIPT_NAME.d"
@@ -236,7 +236,12 @@ Update_MdmErrors(){
 		else
 			newcorr=$(($2-oldcorr))	
 		fi
-		sed -i "s/^$3,.*/$3,$newcorr,$2/g" "$SCRIPT_DIR/modem$1"
+		sed -i "s/^$3,.*/$3,$2,$newcorr/g" "$SCRIPT_DIR/modem$1"
+
+		echo "Stats: "
+		echo -n "Channel $3  Oldcorr  $oldcorr  Newcorr  $newcorr  Modem  $2"
+		echo
+
 }
 
 Display_MdmErrors(){
@@ -246,24 +251,25 @@ Display_MdmErrors(){
 
 
 	printf "\\n${BOLD}Correctable Errors\\n${CLEARFORMAT} "
-	printf "\\n${BOLD}Channel	Latest		Historic\\n${CLEARFORMAT} "
+	printf "\\n${BOLD}Channel     Latest      Historic\\n${CLEARFORMAT}"
+	fmt="   %-12s%-12s%-12s\\n"
 	channelcnt="$(wc -l < "$SCRIPT_DIR/modemRxCorr" )"
  	counter=1
 		until [ $counter -gt "$channelcnt" ]; do
 			latest="$(grep "^$counter," "$SCRIPT_DIR/modemRxCorr" | awk -F "," '{print $2}')"
 			historic="$(grep "^$counter," "$SCRIPT_DIR/modemRxCorr" | awk -F "," '{print $3}')"
-			printf "$counter	  $latest		  $historic\\n"
+			printf "$fmt" "$counter" "$latest" "$historic"
 			counter=$((counter + 1))	
 		done
 	printf "\\n\\n"
         printf "\\n${BOLD}UnCorrectable Errors\\n${CLEARFORMAT} "
-        printf "\\n${BOLD}Channel       Latest          Historic\\n${CLEARFORMAT} "
+        printf "\\n${BOLD}Channel     Latest      Historic\\n${CLEARFORMAT}"
         channelcnt="$(wc -l < "$SCRIPT_DIR/modemRxUncor" )"
         counter=1
                 until [ $counter -gt "$channelcnt" ]; do
                         latest="$(grep "^$counter," "$SCRIPT_DIR/modemRxUncor" | awk -F "," '{print $2}')"
                         historic="$(grep "^$counter," "$SCRIPT_DIR/modemRxUncor" | awk -F "," '{print $3}')"
-                        printf "$counter          $latest                 $historic\\n"
+			printf "$fmt" "$counter" "$latest" "$historic"
                         counter=$((counter + 1))
                 done
         printf "\\n\\n"
