@@ -807,7 +807,7 @@ Credentials(){
 				
 				rm -f "/tmp/checkcreds.txt" 2>/dev/null
 				/usr/sbin/curl -v "http://192.168.100.1/goform/login" --data "loginUsername=$loginname&loginPassword=$password" 2> /tmp/checkcreds.txt
-				if [ "$(grep -c "login.asp" "/tmp/checkcreds.txt")" -gt 0 ]; then
+				if [ "$(grep -c "home.asp" "/tmp/checkcreds.txt")" -eq 0 ]; then
 					printf "\\n"	
 					printf "\\n${ERR}Login name and/or password is invalid.  Please retry.${CLEARFORMAT}  "
 				else
