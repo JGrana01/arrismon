@@ -23,7 +23,7 @@
 ### Start of script variables ###
 readonly SCRIPT_NAME="arrismon"
 readonly SCRIPT_VERSION="v0.3.4-beta"
-SCRIPT_BRANCH="credentials"
+SCRIPT_BRANCH="Credentials"
 SCRIPT_REPO="https://raw.githubusercontent.com/WRKDBF-Guy/$SCRIPT_NAME/$SCRIPT_BRANCH"
 readonly SCRIPT_DIR="/jffs/addons/$SCRIPT_NAME.d"
 readonly SCRIPT_WEBPAGE_DIR="$(readlink /www/user)"
