@@ -162,6 +162,15 @@ var $j=jQuery.noConflict(),arraysortlistlines=[],sortname="Time",sortdir="desc",
 <label for="arrismon_shownotice_false">False</label>
 </td>
 </tr>
+<tr class="even" id="rowcredentials">
+<td class="settingname">Cable Modem requires Credentials (False)<br/><span class="settingname">(Credentials: Login name and password)</span></td>
+<td class="settingvalue">
+<input type="radio" name="arrismon_showcredentials" id="arrismon_showcreds_true" class="input" value="true" checked>
+<label for="arrismon_showcreds_true">True</label>
+<input type="radio" name="arrismon_showcreds" id="arrismon_showcreds_false" class="input" value="false">
+<label for="arrismon_showcreds_false">False</label>
+</td>
+</tr>
 <tr class="apply_gen" valign="top" height="35px">
 <td colspan="2" class="savebutton">
 <input type="button" onclick="SaveConfig();" value="Save" class="button_gen savebutton" name="button">
