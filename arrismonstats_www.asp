@@ -163,12 +163,9 @@ var $j=jQuery.noConflict(),arraysortlistlines=[],sortname="Time",sortdir="desc",
 </td>
 </tr>
 <tr class="even" id="rowcredentials">
-<td class="settingname">Cable Modem requires Credentials (False)<br/><span class="settingname">(Credentials: Login name and password)</span></td>
+<td class="settingname">Cable Modem credentials, if required</td>
 <td class="settingvalue">
-<input type="radio" name="arrismon_showcredentials" id="arrismon_showcreds_true" class="input" value="true" checked>
-<label for="arrismon_showcreds_true">True</label>
-<input type="radio" name="arrismon_showcreds" id="arrismon_showcreds_false" class="input" value="false">
-<label for="arrismon_showcreds_false">False</label>
+<input autocomplete="off" type="text" maxlength="10" class="input_10_table removespacing" name="arrismon_loginname" &nbsp;login name <span style="color:#FFCC00;">(*NA denotes not applicable)</span>
 </td>
 </tr>
 <tr class="apply_gen" valign="top" height="35px">
