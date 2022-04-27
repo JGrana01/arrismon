@@ -166,7 +166,7 @@ var $j=jQuery.noConflict(),arraysortlistlines=[],sortname="Time",sortdir="desc",
 <td class="settingname">Cable Modem credentials, if required</td>
 <td class="settingvalue">
 <input autocomplete="off" type="text" maxlength="10" class="input_10_table removespacing" name="arrismon_loginname"/>
-&nbsp;login name <span style="color:#FFCC00;">(*NA denotes not applicable)</span>
+&nbsp;          login name <span style="color:#FFCC00;">(*NA denotes not applicable)</span>
 <input autocomplete="off" type="text" maxlength="25" class="input_25_table removespacing" name="arrismon_password"/>
 &nbsp;password
 </td>
