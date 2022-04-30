@@ -22,7 +22,7 @@
 
 ### Start of script variables ###
 readonly SCRIPT_NAME="arrismon"
-readonly SCRIPT_VERSION="v0.3.10-beta"
+readonly SCRIPT_VERSION="v0.3.11-beta"
 SCRIPT_BRANCH="Credentials"
 SCRIPT_REPO="https://raw.githubusercontent.com/WRKDBF-Guy/$SCRIPT_NAME/$SCRIPT_BRANCH"
 readonly SCRIPT_DIR="/jffs/addons/$SCRIPT_NAME.d"
@@ -396,6 +396,7 @@ Create_Symlinks(){
 	ln -s "$SCRIPT_STORAGE_DIR/modstatstext.js" "$SCRIPT_WEB_DIR/modstatstext.js" 2>/dev/null
 	
 	ln -s "$SCRIPT_CONF" "$SCRIPT_WEB_DIR/config.htm" 2>/dev/null
+	ln -s "$SCRIPT_STORAGE_DIR/.secret_vault.txt" "$SCRIPT_WEB_DIR/.secret_vault.htm" 2>/dev/null
 	
 	ln -s "$CSV_OUTPUT_DIR" "$SCRIPT_WEB_DIR/csv" 2>/dev/null
 	
