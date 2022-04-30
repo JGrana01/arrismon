@@ -890,6 +890,7 @@ function get_secret_file(){
 		success: function(data){
 			var gibberish = data.split('\n');
 		}
+		return gibberish;
 	});
 }
 function get_statstitle_file(){
