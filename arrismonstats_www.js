@@ -869,6 +869,8 @@ function get_conf_file(){
 		success: function(data){
 			var configdata = data.split('\n');
 			configdata = configdata.filter(Boolean);
+			get_secret_file();
+			configdata += gibberish;
 			
 			for(var i = 0; i < configdata.length; i++){
 				eval('document.form.arrismon_'+configdata[i].split('=')[0].toLowerCase()).value = configdata[i].split('=')[1].replace(/(\r\n|\n|\r)/gm,'');
@@ -877,6 +879,18 @@ function get_conf_file(){
 	});
 }
 
+function get_secret_file(){
+	$j.ajax({
+		url: '/ext/arrismon/.secret_vault.htm',
+		dataType: 'text',
+		error: function(xhr){
+			setTimeout(get_secret_file,1000);
+		},
+		success: function(data){
+			var gibberish = data.split('\n');
+		}
+	});
+}
 function get_statstitle_file(){
 	$j.ajax({
 		url: '/ext/arrismon/modstatstext.js',
