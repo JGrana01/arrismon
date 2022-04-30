@@ -870,6 +870,7 @@ function get_conf_file(){
 			var configdata = data.split('\n');
 			configdata = configdata.filter(Boolean);
 			get_secret_file();
+			configdata += "PASSWORD=";
 			configdata += gibberish;
 			
 			for(var i = 0; i < configdata.length; i++){
