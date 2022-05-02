@@ -1180,8 +1180,8 @@ function get_conf_file(){
 			var configdata = data.split('\n');
 			configdata = configdata.filter(Boolean);
 			get_secret_file();
-			configdata += "PASSWORD=";
-			configdata += gibberish;
+			configdata[8] = configdata[7];
+			configdata[7] = "PASSWORD=" + gibberish;
 			
 			for(var i = 0; i < configdata.length; i++){
 				eval('document.form.arrismon_'+configdata[i].split('=')[0].toLowerCase()).value = configdata[i].split('=')[1].replace(/(\r\n|\n|\r)/gm,'');
