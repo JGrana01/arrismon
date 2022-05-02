@@ -1179,11 +1179,13 @@ function get_conf_file(){
 		success: function(data){
 			var configdata = data.split('\n');
 			configdata = configdata.filter(Boolean);
-			get_secret_file();
 			
 			for(var i = 0; i < configdata.length; i++){
 				eval('document.form.arrismon_'+configdata[i].split('=')[0].toLowerCase()).value = configdata[i].split('=')[1].replace(/(\r\n|\n|\r)/gm,'');
 			}
+			
+			get_secret_file();
+			document.form.arrismon_password = gibberish;
 		}
 	});
 }
