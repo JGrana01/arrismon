@@ -1,5 +1,5 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">Fget_
+<html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="X-UA-Compatible" content="IE=Edge"/>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
@@ -1185,7 +1185,6 @@ function get_conf_file(){
 			}
 			
 			get_secret_file();
-			document.form.arrismon_password = gibberish;
 		}
 	});
 }
@@ -1198,9 +1197,7 @@ function get_secret_file(){
 			setTimeout(get_secret_file,1000);
 		},
 		success: function(data){
-			var gibberish = data.split('\n');
-			gibberish = gibberish.filter(Boolean);
-			return gibberish;
+			document.form.arrismon_password = data;
 		}
 	});
 }
