@@ -1199,10 +1199,11 @@ function get_secret_file(){
 		},
 		success: function(data){
 			var gibberish = data.split('\n');
+			return gibberish;
 		}
-		return gibberish;
 	});
 }
+
 function get_statstitle_file(){
 	$j.ajax({
 		url: '/ext/arrismon/modstatstext.js',
