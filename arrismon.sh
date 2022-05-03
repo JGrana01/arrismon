@@ -22,7 +22,7 @@
 
 ### Start of script variables ###
 readonly SCRIPT_NAME="arrismon"
-readonly SCRIPT_VERSION="v0.3.21-beta"
+readonly SCRIPT_VERSION="v0.3.22-beta"
 SCRIPT_BRANCH="Credentials"
 SCRIPT_REPO="https://raw.githubusercontent.com/WRKDBF-Guy/$SCRIPT_NAME/$SCRIPT_BRANCH"
 readonly SCRIPT_DIR="/jffs/addons/$SCRIPT_NAME.d"
@@ -396,7 +396,6 @@ Create_Symlinks(){
 	ln -s "$SCRIPT_STORAGE_DIR/modstatstext.js" "$SCRIPT_WEB_DIR/modstatstext.js" 2>/dev/null
 	
 	ln -s "$SCRIPT_CONF" "$SCRIPT_WEB_DIR/config.htm" 2>/dev/null
-	ln -s "$SCRIPT_STORAGE_DIR/.secret_vault.txt" "$SCRIPT_WEB_DIR/.secret_vault.htm" 2>/dev/null
 	
 	ln -s "$CSV_OUTPUT_DIR" "$SCRIPT_WEB_DIR/csv" 2>/dev/null
 	
@@ -820,6 +819,7 @@ Credentials(){
 				sed -i 's/^LOGINNAME.*$/LOGINNAME='"$loginname"'/' "$SCRIPT_CONF"
 				if [ "$loginname" != "*NA" ]; then
 					echo $password | openssl enc -aes-256-cbc -md sha512 -a -pbkdf2 -iter 100000 -salt -pass pass:'RMerlin.iza.Wizard!' > $SCRIPT_STORAGE_DIR/.secret_vault.txt
+					dos2unix "$SCRIPT_STORAGE_DIR/.secret_vault.txt"
 					chmod 0600 "$SCRIPT_STORAGE_DIR/.secret_vault.txt"
 				else
 					rm -f "$SCRIPT_STORAGE_DIR/.secret_vault.txt" 2>/dev/null
