@@ -1183,21 +1183,6 @@ function get_conf_file(){
 			for(var i = 0; i < configdata.length; i++){
 				eval('document.form.arrismon_'+configdata[i].split('=')[0].toLowerCase()).value = configdata[i].split('=')[1].replace(/(\r\n|\n|\r)/gm,'');
 			}
-			
-			get_secret_file();
-		}
-	});
-}
-
-function get_secret_file(){
-	$j.ajax({
-		url: '/ext/arrismon/.secret_vault.htm',
-		dataType: 'text',
-		error: function(xhr){
-			setTimeout(get_secret_file,1000);
-		},
-		success: function(data){
-			document.form.arrismon_password = data;
 		}
 	});
 }
