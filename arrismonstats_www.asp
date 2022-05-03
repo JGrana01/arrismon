@@ -1669,9 +1669,9 @@ function AddEventHandlers(){
 <tr class="even" id="rowcredentials">
 <td class="settingname">Cable Modem credentials, if required</td>
 <td class="settingvalue">
-<input autocomplete="off" type="text" maxlength="10" class="input_10_table removespacing" name="arrismon_loginname"/>
+<input autocomplete="off" type="text" autocomplete="on" maxlength="10" class="input_10_table removespacing" name="arrismon_loginname"/>
 &nbsp; login name <span style="color:#FFCC00;">(*NA denotes not applicable.)</span>
-<input autocomplete="off" type="text" maxlength="25" class="input_25_table removespacing" name="arrismon_password"/>
+<input autocomplete="off" type="password" autocomplete="current-password" maxlength="25" class="input_25_table removespacing" name="arrismon_password"/>
 &nbsp;password
 </td>
 </tr>
