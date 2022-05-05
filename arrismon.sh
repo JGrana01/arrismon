@@ -415,12 +415,15 @@ Conf_Exists(){
 		if ! grep -q "LOGINNAME" "$SCRIPT_CONF"; then
 			echo "LOGINNAME=*NA" >> "$SCRIPT_CONF"
 		fi
+		if ! grep -q "PASSWORD" "$SCRIPT_CONF"; then
+			echo "PASSWORD=*NA" >> "$SCRIPT_CONF"
+		fi
 		if ! grep -q "RESETERRORCT" "$SCRIPT_CONF"; then
 			echo "RESETERRORCT=Y" >> "$SCRIPT_CONF"
 		fi
 		return 0
 	else
-		{ echo "OUTPUTDATAMODE=average"; echo "OUTPUTTIMEMODE=unix"; echo "STORAGELOCATION=jffs"; echo "SHOWNOTICE=false"; echo "DAYSTOKEEP=30"; echo "LOGINNAME=*NA"; echo "RESETERRORCT=Y"; } > "$SCRIPT_CONF"                                                                         
+		{ echo "OUTPUTDATAMODE=average"; echo "OUTPUTTIMEMODE=unix"; echo "STORAGELOCATION=jffs"; echo "SHOWNOTICE=false"; echo "DAYSTOKEEP=30"; echo "LOGINNAME=*NA"; echo "PASSWORD=*NA"; echo "RESETERRORCT=Y"; } > "$SCRIPT_CONF"                                                                         
 
 		return 1
 	fi
@@ -818,11 +821,11 @@ Credentials(){
 			if [ "$exitmenu" != "exit" ]; then
 				sed -i 's/^LOGINNAME.*$/LOGINNAME='"$loginname"'/' "$SCRIPT_CONF"
 				if [ "$loginname" != "*NA" ]; then
-					echo $password | openssl enc -aes-256-cbc -md sha512 -a -pbkdf2 -iter 100000 -salt -pass pass:'RMerlin.iza.Wizard!' > $SCRIPT_STORAGE_DIR/.secret_vault.txt
-					dos2unix "$SCRIPT_STORAGE_DIR/.secret_vault.txt"
-					chmod 0600 "$SCRIPT_STORAGE_DIR/.secret_vault.txt"
+					echo $password | openssl enc -aes-256-cbc -md sha512 -a -pbkdf2 -iter 100000 -salt -pass pass:'RMerlin.iza.Wizard!' > /tmp/.secret_vault.txt
+					sed -i 's/^PASSWORD.*$/PASSWORD='"$(cat /tmp/.secret_vault.txt)"'/' "$SCRIPT_CONF"
 				else
-					rm -f "$SCRIPT_STORAGE_DIR/.secret_vault.txt" 2>/dev/null
+					rm -f "/tmp/.secret_vault.txt" 2>/dev/null
+					sed -i 's/^PASSWORD.*$/PASSWORD="*NA"/' "$SCRIPT_CONF"
 				fi
 				return 0
 			else
@@ -833,7 +836,7 @@ Credentials(){
 		check)
 			loginname=$(grep "LOGINNAME" "$SCRIPT_CONF" | cut -f2 -d"=")
 			if [ "$loginname" != "*NA" ]; then
-				gibberish=$(cat "$SCRIPT_STORAGE_DIR"/.secret_vault.txt)
+				gibberish=$(grep "PASSWORD" "$SCRIPT_CONF" | cut -f2 -d"=")
 				password=$(echo "$gibberish" | openssl enc -aes-256-cbc -md sha512 -a -d -pbkdf2 -iter 100000 -salt -pass pass:'RMerlin.iza.Wizard!')
 			fi	
 			echo "$loginname"
@@ -946,7 +949,7 @@ Get_Modem_Stats(){
 	loginname=$(grep "LOGINNAME" "$SCRIPT_CONF" | cut -f2 -d"=")
 	
 	if [ "$loginname" != "*NA" ]; then
-		gibberish=$(cat $SCRIPT_STORAGE_DIR/.secret_vault.txt)
+		gibberish=$(grep "PASSWORD" "$SCRIPT_CONF" | cut -f2 -d"=")
 		password=$(echo "$gibberish" | openssl enc -aes-256-cbc -md sha512 -a -d -pbkdf2 -iter 100000 -salt -pass pass:'RMerlin.iza.Wizard!')
 		/usr/sbin/curl "http://192.168.100.1/goform/login" -H "Content-Type: application/x-www-form-urlencoded" --data "loginUsername=$loginname&loginPassword=$password"
 	fi
