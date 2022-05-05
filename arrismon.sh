@@ -22,7 +22,7 @@
 
 ### Start of script variables ###
 readonly SCRIPT_NAME="arrismon"
-readonly SCRIPT_VERSION="v0.3.24-beta"
+readonly SCRIPT_VERSION="v0.3.25-beta"
 SCRIPT_BRANCH="Credentials"
 SCRIPT_REPO="https://raw.githubusercontent.com/WRKDBF-Guy/$SCRIPT_NAME/$SCRIPT_BRANCH"
 readonly SCRIPT_DIR="/jffs/addons/$SCRIPT_NAME.d"
@@ -839,7 +839,9 @@ Credentials(){
 			loginname=$(grep "LOGINNAME" "$SCRIPT_CONF" | cut -f2 -d"=")
 			if [ "$loginname" != "*NA" ]; then
 				gibberish=$(grep "PASSWORD" "$SCRIPT_CONF" | cut -f2 -d"=")
+				echo "$gibberish"
 				password=$(echo "$gibberish" | openssl enc -aes-256-cbc -md sha512 -a -d -pbkdf2 -iter 100000 -salt -pass pass:'RMerlin.iza.Wizard!')
+				echo "$password"
 			fi	
 			echo "$loginname"
 		;;
