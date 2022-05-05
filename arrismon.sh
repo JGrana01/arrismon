@@ -22,7 +22,7 @@
 
 ### Start of script variables ###
 readonly SCRIPT_NAME="arrismon"
-readonly SCRIPT_VERSION="v0.3.26-beta"
+readonly SCRIPT_VERSION="v0.3.27-beta"
 SCRIPT_BRANCH="Credentials"
 SCRIPT_REPO="https://raw.githubusercontent.com/WRKDBF-Guy/$SCRIPT_NAME/$SCRIPT_BRANCH"
 readonly SCRIPT_DIR="/jffs/addons/$SCRIPT_NAME.d"
@@ -822,10 +822,10 @@ Credentials(){
 				sed -i 's/^LOGINNAME.*$/LOGINNAME='"$loginname"'/' "$SCRIPT_CONF"
 				if [ "$loginname" != "*NA" ]; then
 					gibberish=$(echo $password | openssl enc -aes-256-cbc -md sha512 -a -pbkdf2 -iter 100000 -salt -pass pass:'RMerlin.iza.Wizard!')
-					sed -i 's_^PASSWORD.*$/PASSWORD='"$gibberish"'/' "$SCRIPT_CONF"
+					sed -i 's_^PASSWORD.*$/PASSWORD='"$gibberish"'_' "$SCRIPT_CONF"
 				else
 					rm -f "/tmp/.secret_vault.txt" 2>/dev/null
-					sed -i 's_^PASSWORD.*$/PASSWORD="*NA"/' "$SCRIPT_CONF"
+					sed -i 's_^PASSWORD.*$/PASSWORD="*NA"_' "$SCRIPT_CONF"
 				fi
 				return 0
 			else
