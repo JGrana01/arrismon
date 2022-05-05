@@ -822,12 +822,10 @@ Credentials(){
 				sed -i 's/^LOGINNAME.*$/LOGINNAME='"$loginname"'/' "$SCRIPT_CONF"
 				if [ "$loginname" != "*NA" ]; then
 					gibberish=$(echo $password | openssl enc -aes-256-cbc -md sha512 -a -pbkdf2 -iter 100000 -salt -pass pass:'RMerlin.iza.Wizard!')
-					printf "//n$gibberish"
-					sed -i 's/^PASSWORD.*$/PASSWORD='"$gibberish"'/' "$SCRIPT_CONF"
-					printf "//n$password"
+					sed -i 's_^PASSWORD.*$/PASSWORD='"$gibberish"'/' "$SCRIPT_CONF"
 				else
 					rm -f "/tmp/.secret_vault.txt" 2>/dev/null
-					sed -i 's/^PASSWORD.*$/PASSWORD="*NA"/' "$SCRIPT_CONF"
+					sed -i 's_^PASSWORD.*$/PASSWORD="*NA"/' "$SCRIPT_CONF"
 				fi
 				return 0
 			else
@@ -839,9 +837,7 @@ Credentials(){
 			loginname=$(grep "LOGINNAME" "$SCRIPT_CONF" | cut -f2 -d"=")
 			if [ "$loginname" != "*NA" ]; then
 				gibberish=$(grep "PASSWORD" "$SCRIPT_CONF" | cut -f2 -d"=")
-				echo "$gibberish"
 				password=$(echo "$gibberish" | openssl enc -aes-256-cbc -md sha512 -a -d -pbkdf2 -iter 100000 -salt -pass pass:'RMerlin.iza.Wizard!')
-				echo "$password"
 			fi	
 			echo "$loginname"
 		;;
