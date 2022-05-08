@@ -22,7 +22,7 @@
 
 ### Start of script variables ###
 readonly SCRIPT_NAME="arrismon"
-readonly SCRIPT_VERSION="v0.3.32-beta"
+readonly SCRIPT_VERSION="v0.3.33-beta"
 SCRIPT_BRANCH="Credentials"
 SCRIPT_REPO="https://raw.githubusercontent.com/WRKDBF-Guy/$SCRIPT_NAME/$SCRIPT_BRANCH"
 readonly SCRIPT_DIR="/jffs/addons/$SCRIPT_NAME.d"
@@ -833,7 +833,7 @@ Credentials(){
 		check)
 			loginname=$(grep "LOGINNAME" "$SCRIPT_CONF" | cut -f2 -d"=")
 			if [ "$loginname" != "*NA" ]; then
-				gibberish=$(grep "PASSWORD" "$SCRIPT_CONF" | cut -f2 -d"=")
+				gibberish=$(grep "PASSWORD" "$SCRIPT_CONF" | cut -c10-53)
 				Decrypt_Pwd "$gibberish"
 			fi	
 			echo "$loginname"
@@ -953,7 +953,7 @@ Get_Modem_Stats(){
 	loginname=$(grep "LOGINNAME" "$SCRIPT_CONF" | cut -f2 -d"=")
 	
 	if [ "$loginname" != "*NA" ]; then
-		gibberish=$(grep "PASSWORD" "$SCRIPT_CONF" | cut -f2 -d"=")
+		gibberish=$(grep "PASSWORD" "$SCRIPT_CONF" | cut -c10-53)
 		Decrypt_Pwd "$gibberish"
 		/usr/sbin/curl "http://192.168.100.1/goform/login" -H "Content-Type: application/x-www-form-urlencoded" --data "loginUsername=$loginname&loginPassword=$password"
 	fi
