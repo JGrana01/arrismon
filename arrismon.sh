@@ -22,7 +22,7 @@
 
 ### Start of script variables ###
 readonly SCRIPT_NAME="arrismon"
-readonly SCRIPT_VERSION="v0.3.29-beta"
+readonly SCRIPT_VERSION="v0.3.30-beta"
 SCRIPT_BRANCH="Credentials"
 SCRIPT_REPO="https://raw.githubusercontent.com/WRKDBF-Guy/$SCRIPT_NAME/$SCRIPT_BRANCH"
 readonly SCRIPT_DIR="/jffs/addons/$SCRIPT_NAME.d"
@@ -833,6 +833,7 @@ Credentials(){
 		check)
 			loginname=$(grep "LOGINNAME" "$SCRIPT_CONF" | cut -f2 -d"=")
 			if [ "$loginname" != "*NA" ]; then
+				gibberish=$(grep "PASSWORD" "$SCRIPT_CONF" | cut -f2 -d"=")
 				Decrypt_Pwd "$gibberish"
 			fi	
 			echo "$loginname"
@@ -841,16 +842,11 @@ Credentials(){
 }
 
 Encrypt_Pwd(){
-	echo "$1" | openssl enc -aes-256-cbc -md sha512 -a -pbkdf2 -iter 100000 -salt -pass pass:'RMerlin.iza.Wizard!' > /tmp/.secret_vault.txt
-	gibberish=$(cat /tmp/.secret_vault.txt)
-	rm -f /tmp/.secret_vault.txt
+	gibberish=$(echo "$1" | openssl enc -aes-256-cbc -md sha512 -a -pbkdf2 -iter 100000 -salt -pass pass:'RMerlin.iza.Wizard!')
 }
 
 Decrypt_Pwd(){
-	gibberish=$(grep "PASSWORD" "$SCRIPT_CONF" | cut -f2 -d"=")
-	echo "$gibberish" | openssl enc -aes-256-cbc -md sha512 -a -d -pbkdf2 -iter 100000 -salt -pass pass:'RMerlin.iza.Wizard!' > /tmp/.secret_vault.CompleteResults_TxTimes
-	password=$(cat /tmp/.secret_vault.txt)
-	rm -f /tmp/.secret_vault.txt
+	password=$(echo "$1" | openssl enc -aes-256-cbc -md sha512 -a -d -pbkdf2 -iter 100000 -salt -pass pass:'RMerlin.iza.Wizard!')
 }
 
 WriteStats_ToJS(){
@@ -957,9 +953,8 @@ Get_Modem_Stats(){
 	loginname=$(grep "LOGINNAME" "$SCRIPT_CONF" | cut -f2 -d"=")
 	
 	if [ "$loginname" != "*NA" ]; then
-		Decrypt_Pwd "$gibberish"
 		gibberish=$(grep "PASSWORD" "$SCRIPT_CONF" | cut -f2 -d"=")
-		password=$(echo "$gibberish" | openssl enc -aes-256-cbc -md sha512 -a -d -pbkdf2 -iter 100000 -salt -pass pass:'RMerlin.iza.Wizard!')
+		Decrypt_Pwd "$gibberish"
 		/usr/sbin/curl "http://192.168.100.1/goform/login" -H "Content-Type: application/x-www-form-urlencoded" --data "loginUsername=$loginname&loginPassword=$password"
 	fi
 	
