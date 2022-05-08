@@ -819,8 +819,7 @@ Credentials(){
 			if [ "$exitmenu" != "exit" ]; then
 				sed -i 's/^LOGINNAME.*$/LOGINNAME='"$loginname"'/' "$SCRIPT_CONF"
 				if [ "$loginname" != "*NA" ]; then
-					echo $password | openssl enc -aes-256-cbc -md sha512 -a -pbkdf2 -iter 100000 -salt -pass pass:'RMerlin.iza.Wizard!' > /tmp/.secret_vault.txt
-					gibberish=$(echo $password | openssl enc -aes-256-cbc -md sha512 -a -pbkdf2 -iter 100000 -salt -pass pass:'RMerlin.iza.Wizard!')
+					Encrypt_Pwd "$password"
 					sed -i 's_^PASSWORD.*$_PASSWORD='"$gibberish"'_' "$SCRIPT_CONF"
 				else
 					sed -i 's_^PASSWORD.*$_PASSWORD="*NA"_' "$SCRIPT_CONF"
@@ -834,14 +833,25 @@ Credentials(){
 		check)
 			loginname=$(grep "LOGINNAME" "$SCRIPT_CONF" | cut -f2 -d"=")
 			if [ "$loginname" != "*NA" ]; then
-				gibberish=$(grep "PASSWORD" "$SCRIPT_CONF" | cut -f2 -d"=")
-				password=$(echo "$gibberish" | openssl enc -aes-256-cbc -md sha512 -a -d -pbkdf2 -iter 100000 -salt -pass pass:'RMerlin.iza.Wizard!')
+				Decrypt_Pwd "$gibberish"
 			fi	
 			echo "$loginname"
 		;;
 	esac
 }
 
+Encrypt_Pwd(){
+	echo "$1" | openssl enc -aes-256-cbc -md sha512 -a -pbkdf2 -iter 100000 -salt -pass pass:'RMerlin.iza.Wizard!' > /tmp/.secret_vault.txt
+	gibberish=$(cat /tmp/.secret_vault.txt)
+	rm -f /tmp/.secret_vault.txt
+}
+
+Decrypt_Pwd(){
+	gibberish=$(grep "PASSWORD" "$SCRIPT_CONF" | cut -f2 -d"=")
+	echo "$gibberish" | openssl enc -aes-256-cbc -md sha512 -a -d -pbkdf2 -iter 100000 -salt -pass pass:'RMerlin.iza.Wizard!' > /tmp/.secret_vault.CompleteResults_TxTimes
+	password=$(cat /tmp/.secret_vault.txt)
+	rm -f /tmp/.secret_vault.txt
+}
 
 WriteStats_ToJS(){
 	echo "function $3(){" > "$2"
@@ -947,6 +957,7 @@ Get_Modem_Stats(){
 	loginname=$(grep "LOGINNAME" "$SCRIPT_CONF" | cut -f2 -d"=")
 	
 	if [ "$loginname" != "*NA" ]; then
+		Decrypt_Pwd "$gibberish"
 		gibberish=$(grep "PASSWORD" "$SCRIPT_CONF" | cut -f2 -d"=")
 		password=$(echo "$gibberish" | openssl enc -aes-256-cbc -md sha512 -a -d -pbkdf2 -iter 100000 -salt -pass pass:'RMerlin.iza.Wizard!')
 		/usr/sbin/curl "http://192.168.100.1/goform/login" -H "Content-Type: application/x-www-form-urlencoded" --data "loginUsername=$loginname&loginPassword=$password"
