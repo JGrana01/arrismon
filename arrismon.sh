@@ -947,11 +947,8 @@ Get_Modem_Stats(){
 	loginname=$(grep "LOGINNAME" "$SCRIPT_CONF" | cut -f2 -d"=")
 	
 	if [ "$loginname" != "*NA" ]; then
-		printf "1"
 		gibberish=$(grep "PASSWORD" "$SCRIPT_CONF" | cut -f2 -d"=")
-		printf "2"
 		password=$(echo "$gibberish" | openssl enc -aes-256-cbc -md sha512 -a -d -pbkdf2 -iter 100000 -salt -pass pass:'RMerlin.iza.Wizard!')
-		printf "3"
 		/usr/sbin/curl "http://192.168.100.1/goform/login" -H "Content-Type: application/x-www-form-urlencoded" --data "loginUsername=$loginname&loginPassword=$password"
 	fi
 	
