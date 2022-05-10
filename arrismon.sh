@@ -22,7 +22,7 @@
 
 ### Start of script variables ###
 readonly SCRIPT_NAME="arrismon"
-readonly SCRIPT_VERSION="v0.3.33-beta"
+readonly SCRIPT_VERSION="v0.3.34-beta"
 SCRIPT_BRANCH="Credentials"
 SCRIPT_REPO="https://raw.githubusercontent.com/WRKDBF-Guy/$SCRIPT_NAME/$SCRIPT_BRANCH"
 readonly SCRIPT_DIR="/jffs/addons/$SCRIPT_NAME.d"
@@ -418,12 +418,15 @@ Conf_Exists(){
 		if ! grep -q "PASSWORD" "$SCRIPT_CONF"; then
 			echo "PASSWORD=*NA" >> "$SCRIPT_CONF"
 		fi
+		if ! grep -q "MASKPWD" "$SCRIPT_CONF"; then
+			echo "MASKPWD=*NA" >> "$SCRIPT_CONF"
+		fi
 		if ! grep -q "RESETERRORCT" "$SCRIPT_CONF"; then
 			echo "RESETERRORCT=Y" >> "$SCRIPT_CONF"
 		fi
 		return 0
 	else
-		{ echo "OUTPUTDATAMODE=average"; echo "OUTPUTTIMEMODE=unix"; echo "STORAGELOCATION=jffs"; echo "SHOWNOTICE=false"; echo "DAYSTOKEEP=30"; echo "LOGINNAME=*NA"; echo "PASSWORD=*NA"; echo "RESETERRORCT=Y"; } > "$SCRIPT_CONF"                                                                         
+		{ echo "OUTPUTDATAMODE=average"; echo "OUTPUTTIMEMODE=unix"; echo "STORAGELOCATION=jffs"; echo "SHOWNOTICE=false"; echo "DAYSTOKEEP=30"; echo "LOGINNAME=*NA"; echo "PASSWORD=*NA"; echo "MASKPWD=*NA"; echo "RESETERRORCT=Y"; } > "$SCRIPT_CONF"                                                                         
 
 		return 1
 	fi
@@ -776,38 +779,38 @@ Credentials(){
 	case "$1" in
 		update)
 			ScriptHeader
-			loginname="*NA"
-			password=""
+			LOGINNAME="*NA"
+			PASSWORD=""
 			exitmenu=""
 			
 			while true; do
-				loginname_inp=""
-				password_inp=""
+				LOGINNAME_INP=""
+				PASSWORD_INP=""
 
 				printf "\\n${BOLD}Please enter the login name for your cable modem:${CLEARFORMAT}  "
 			
-				read -r loginname_inp
-				if [ "$loginname_inp" = "e" ]; then
+				read -r LOGINNAME_INP
+				if [ "$LOGINNAME_INP" = "e" ]; then
 					exitmenu="exit"
 					break
 				fi
 				
-				loginname="$loginname_inp"
+				LOGINNAME="$LOGINNAME_INP"
 				printf "\\n"	
 				printf "\\n${BOLD}Please enter the password for your cable modem:${CLEARFORMAT}  "
 				
 				stty -echo
-				read -r password_inp
+				read -r PASSWORD_INP
 				stty echo
-				if [ "$password_inp" = "e" ]; then
+				if [ "$PASSWORD_INP" = "e" ]; then
 					exitmenu="exit"
 					break
 				fi
-				password="$password_inp"
+				PASSWORD="$PASSWORD_INP"
 				printf "\\n"
 				
 				rm -f "/tmp/checkcreds.txt" 2>/dev/null
-				/usr/sbin/curl -v "http://192.168.100.1/goform/login" --data "loginUsername=$loginname&loginPassword=$password" 2> /tmp/checkcreds.txt
+				/usr/sbin/curl -v "http://192.168.100.1/goform/login" --data "loginUsername=$LOGINNAME&loginPassword=$PASSWORD" 2> /tmp/checkcreds.txt
 				if [ "$(grep -c "home.asp" "/tmp/checkcreds.txt")" -eq 0 ]; then
 					printf "\\n"	
 					printf "\\n${ERR}Login name and/or password is invalid.  Please retry.${CLEARFORMAT}  "
@@ -817,10 +820,10 @@ Credentials(){
 			done
 			
 			if [ "$exitmenu" != "exit" ]; then
-				sed -i 's/^LOGINNAME.*$/LOGINNAME='"$loginname"'/' "$SCRIPT_CONF"
-				if [ "$loginname" != "*NA" ]; then
-					Encrypt_Pwd "$password"
-					sed -i 's_^PASSWORD.*$_PASSWORD='"$gibberish"'_' "$SCRIPT_CONF"
+				sed -i 's/^LOGINNAME.*$/LOGINNAME='"$LOGINNAME"'/' "$SCRIPT_CONF"
+				if [ "$LOGINNAME" != "*NA" ]; then
+					Encrypt_Password
+					sed -i 's_^PASSWORD.*$_PASSWORD='"$ENCRYPTED_PWD"'_' "$SCRIPT_CONF"
 				else
 					sed -i 's_^PASSWORD.*$_PASSWORD="*NA"_' "$SCRIPT_CONF"
 				fi
@@ -831,22 +834,22 @@ Credentials(){
 			fi
 		;;
 		check)
-			loginname=$(grep "LOGINNAME" "$SCRIPT_CONF" | cut -f2 -d"=")
-			if [ "$loginname" != "*NA" ]; then
-				gibberish=$(grep "PASSWORD" "$SCRIPT_CONF" | cut -c10-53)
-				Decrypt_Pwd "$gibberish"
+			LOGINNAME=$(grep "LOGINNAME" "$SCRIPT_CONF" | cut -f2 -d"=")
+			if [ "$LOGINNAME" != "*NA" ]; then
+				Decrypt_Password
 			fi	
-			echo "$loginname"
+			echo "$LOGINNAME"
 		;;
 	esac
 }
 
-Encrypt_Pwd(){
-	gibberish=$(echo "$password" | openssl enc -aes-256-cbc -md sha512 -a -pbkdf2 -iter 100000 -salt -pass pass:'RMerlin.iza.Wizard!')
+Encrypt_Password(){
+	ENCRYPTED_PWD=$(echo "$PASSWORD" | openssl enc -aes-256-cbc -md sha512 -a -pbkdf2 -iter 100000 -salt -pass pass:'RMerlin.iza.Wizard!')
 }
 
-Decrypt_Pwd(){
-	password=$(echo "$gibberish" | openssl enc -aes-256-cbc -md sha512 -a -d -pbkdf2 -iter 100000 -salt -pass pass:'RMerlin.iza.Wizard!')
+Decrypt_Password(){
+	ENCRYPTED_PWD=$(grep "PASSWORD" "$SCRIPT_CONF" | cut -c10-53)
+	PASSWORD=$(echo "$ENCRYPTED_PWD" | openssl enc -aes-256-cbc -md sha512 -a -d -pbkdf2 -iter 100000 -salt -pass pass:'RMerlin.iza.Wizard!')
 }
 
 WriteStats_ToJS(){
@@ -950,12 +953,11 @@ Get_Modem_Stats(){
 # sorry about the intermediate tmp files - fear of lines to long
 # todo for another day
 
-	loginname=$(grep "LOGINNAME" "$SCRIPT_CONF" | cut -f2 -d"=")
+	LOGINNAME=$(grep "LOGINNAME" "$SCRIPT_CONF" | cut -f2 -d"=")
 	
-	if [ "$loginname" != "*NA" ]; then
-		gibberish=$(grep "PASSWORD" "$SCRIPT_CONF" | cut -c10-53)
-		Decrypt_Pwd "$gibberish"
-		/usr/sbin/curl "http://192.168.100.1/goform/login" -H "Content-Type: application/x-www-form-urlencoded" --data "loginUsername=$loginname&loginPassword=$password"
+	if [ "$LOGINNAME" != "*NA" ]; then
+		Decrypt_Password
+		/usr/sbin/curl "http://192.168.100.1/goform/login" -H "Content-Type: application/x-www-form-urlencoded" --data "loginUsername=$LOGINNAME&loginPassword=$PASSWORD"
 	fi
 	
 	/usr/sbin/curl -fs --retry 3 --connect-timeout 20 'http://192.168.100.1/RgConnect.asp' -H 'User-Agent: Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:98.0) Gecko/20100101 Firefox/98.0' -H 'Accept: */*' -H 'X-CSRF-TOKEN: 7d298d27f7ede0df78c9292cdca2cd57' -H 'X-Requested-With: XMLHttpRequest' -H 'Connection: keep-alive' -H 'Cookie: lang=fr; PHPSESSID=9csugaomqu52rqc6vgul600b91; auth=7d298d27f7ede0df78c9292cdca2cd57'  > "$shstatsfile_curl"
