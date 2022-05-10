@@ -22,7 +22,7 @@
 
 ### Start of script variables ###
 readonly SCRIPT_NAME="arrismon"
-readonly SCRIPT_VERSION="v0.3.35-beta"
+readonly SCRIPT_VERSION="v0.3.36-beta"
 SCRIPT_BRANCH="Credentials"
 SCRIPT_REPO="https://raw.githubusercontent.com/WRKDBF-Guy/$SCRIPT_NAME/$SCRIPT_BRANCH"
 readonly SCRIPT_DIR="/jffs/addons/$SCRIPT_NAME.d"
@@ -415,18 +415,18 @@ Conf_Exists(){
 		if ! grep -q "LOGINNAME" "$SCRIPT_CONF"; then
 			echo "LOGINNAME=*NA" >> "$SCRIPT_CONF"
 		fi
-		if ! grep -q "ENCRYPTED" "$SCRIPT_CONF"; then
-			echo "ENCRYPTED=*NA" >> "$SCRIPT_CONF"
-		fi
 		if ! grep -q "PASSWORD" "$SCRIPT_CONF"; then
 			echo "PASSWORD=*NA" >> "$SCRIPT_CONF"
+		fi
+		if ! grep -q "ENCRYPTED" "$SCRIPT_CONF"; then
+			echo "ENCRYPTED=*NA" >> "$SCRIPT_CONF"
 		fi
 		if ! grep -q "RESETERRORCT" "$SCRIPT_CONF"; then
 			echo "RESETERRORCT=Y" >> "$SCRIPT_CONF"
 		fi
 		return 0
 	else
-		{ echo "OUTPUTDATAMODE=average"; echo "OUTPUTTIMEMODE=unix"; echo "STORAGELOCATION=jffs"; echo "SHOWNOTICE=false"; echo "DAYSTOKEEP=30"; echo "LOGINNAME=*NA"; echo "ENCRYPTED=*NA"; echo "PASSWORD=*NA"; echo "RESETERRORCT=Y"; } > "$SCRIPT_CONF"                                                                         
+		{ echo "OUTPUTDATAMODE=average"; echo "OUTPUTTIMEMODE=unix"; echo "STORAGELOCATION=jffs"; echo "SHOWNOTICE=false"; echo "DAYSTOKEEP=30"; echo "LOGINNAME=*NA"; echo "PASSWORD=*NA"; echo "ENCRYPTED=*NA"; echo "RESETERRORCT=Y"; } > "$SCRIPT_CONF"                                                                         
 
 		return 1
 	fi
