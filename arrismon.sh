@@ -22,7 +22,7 @@
 
 ### Start of script variables ###
 readonly SCRIPT_NAME="arrismon"
-readonly SCRIPT_VERSION="v0.3.34-beta"
+readonly SCRIPT_VERSION="v0.3.35-beta"
 SCRIPT_BRANCH="Credentials"
 SCRIPT_REPO="https://raw.githubusercontent.com/WRKDBF-Guy/$SCRIPT_NAME/$SCRIPT_BRANCH"
 readonly SCRIPT_DIR="/jffs/addons/$SCRIPT_NAME.d"
@@ -415,18 +415,18 @@ Conf_Exists(){
 		if ! grep -q "LOGINNAME" "$SCRIPT_CONF"; then
 			echo "LOGINNAME=*NA" >> "$SCRIPT_CONF"
 		fi
+		if ! grep -q "ENCRYPTED" "$SCRIPT_CONF"; then
+			echo "ENCRYPTED=*NA" >> "$SCRIPT_CONF"
+		fi
 		if ! grep -q "PASSWORD" "$SCRIPT_CONF"; then
 			echo "PASSWORD=*NA" >> "$SCRIPT_CONF"
-		fi
-		if ! grep -q "MASKPWD" "$SCRIPT_CONF"; then
-			echo "MASKPWD=*NA" >> "$SCRIPT_CONF"
 		fi
 		if ! grep -q "RESETERRORCT" "$SCRIPT_CONF"; then
 			echo "RESETERRORCT=Y" >> "$SCRIPT_CONF"
 		fi
 		return 0
 	else
-		{ echo "OUTPUTDATAMODE=average"; echo "OUTPUTTIMEMODE=unix"; echo "STORAGELOCATION=jffs"; echo "SHOWNOTICE=false"; echo "DAYSTOKEEP=30"; echo "LOGINNAME=*NA"; echo "PASSWORD=*NA"; echo "MASKPWD=*NA"; echo "RESETERRORCT=Y"; } > "$SCRIPT_CONF"                                                                         
+		{ echo "OUTPUTDATAMODE=average"; echo "OUTPUTTIMEMODE=unix"; echo "STORAGELOCATION=jffs"; echo "SHOWNOTICE=false"; echo "DAYSTOKEEP=30"; echo "LOGINNAME=*NA"; echo "ENCRYPTED=*NA"; echo "PASSWORD=*NA"; echo "RESETERRORCT=Y"; } > "$SCRIPT_CONF"                                                                         
 
 		return 1
 	fi
@@ -780,7 +780,7 @@ Credentials(){
 		update)
 			ScriptHeader
 			LOGINNAME="*NA"
-			PASSWORD=""
+			UNENCRYPTED_PWD=""
 			exitmenu=""
 			
 			while true; do
@@ -806,11 +806,11 @@ Credentials(){
 					exitmenu="exit"
 					break
 				fi
-				PASSWORD="$PASSWORD_INP"
+				UNENCRYPTED_PWD="$PASSWORD_INP"
 				printf "\\n"
 				
 				rm -f "/tmp/checkcreds.txt" 2>/dev/null
-				/usr/sbin/curl -v "http://192.168.100.1/goform/login" --data "loginUsername=$LOGINNAME&loginPassword=$PASSWORD" 2> /tmp/checkcreds.txt
+				/usr/sbin/curl -v "http://192.168.100.1/goform/login" --data "loginUsername=$LOGINNAME&loginPassword=$UNENCRYPTED_PWD" 2> /tmp/checkcreds.txt
 				if [ "$(grep -c "home.asp" "/tmp/checkcreds.txt")" -eq 0 ]; then
 					printf "\\n"	
 					printf "\\n${ERR}Login name and/or password is invalid.  Please retry.${CLEARFORMAT}  "
@@ -823,9 +823,9 @@ Credentials(){
 				sed -i 's/^LOGINNAME.*$/LOGINNAME='"$LOGINNAME"'/' "$SCRIPT_CONF"
 				if [ "$LOGINNAME" != "*NA" ]; then
 					Encrypt_Password
-					sed -i 's_^PASSWORD.*$_PASSWORD='"$ENCRYPTED_PWD"'_' "$SCRIPT_CONF"
+					sed -i 's_^ENCRYPTED.*$_ENCRYPTED='"$ENCRYPTED_PWD"'_' "$SCRIPT_CONF"
 				else
-					sed -i 's_^PASSWORD.*$_PASSWORD="*NA"_' "$SCRIPT_CONF"
+					sed -i 's_^ENCRYPTED.*$_ENCRYPTED="*NA"_' "$SCRIPT_CONF"
 				fi
 				return 0
 			else
@@ -844,12 +844,12 @@ Credentials(){
 }
 
 Encrypt_Password(){
-	ENCRYPTED_PWD=$(echo "$PASSWORD" | openssl enc -aes-256-cbc -md sha512 -a -pbkdf2 -iter 100000 -salt -pass pass:'RMerlin.iza.Wizard!')
+	ENCRYPTED_PWD=$(echo "$UNENCRYPTED_PWD" | openssl enc -aes-256-cbc -md sha512 -a -pbkdf2 -iter 100000 -salt -pass pass:'RMerlin.iza.Wizard!')
 }
 
 Decrypt_Password(){
-	ENCRYPTED_PWD=$(grep "PASSWORD" "$SCRIPT_CONF" | cut -c10-53)
-	PASSWORD=$(echo "$ENCRYPTED_PWD" | openssl enc -aes-256-cbc -md sha512 -a -d -pbkdf2 -iter 100000 -salt -pass pass:'RMerlin.iza.Wizard!')
+	ENCRYPTED_PWD=$(grep "ENCRYPTED" "$SCRIPT_CONF" | cut -c11-54)
+	UNENCRYPTED_PWD=$(echo "$ENCRYPTED_PWD" | openssl enc -aes-256-cbc -md sha512 -a -d -pbkdf2 -iter 100000 -salt -pass pass:'RMerlin.iza.Wizard!')
 }
 
 WriteStats_ToJS(){
@@ -957,7 +957,7 @@ Get_Modem_Stats(){
 	
 	if [ "$LOGINNAME" != "*NA" ]; then
 		Decrypt_Password
-		/usr/sbin/curl "http://192.168.100.1/goform/login" -H "Content-Type: application/x-www-form-urlencoded" --data "loginUsername=$LOGINNAME&loginPassword=$PASSWORD"
+		/usr/sbin/curl "http://192.168.100.1/goform/login" -H "Content-Type: application/x-www-form-urlencoded" --data "loginUsername=$LOGINNAME&loginPassword=$UNENCRYPTED_PWD"
 	fi
 	
 	/usr/sbin/curl -fs --retry 3 --connect-timeout 20 'http://192.168.100.1/RgConnect.asp' -H 'User-Agent: Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:98.0) Gecko/20100101 Firefox/98.0' -H 'Accept: */*' -H 'X-CSRF-TOKEN: 7d298d27f7ede0df78c9292cdca2cd57' -H 'X-Requested-With: XMLHttpRequest' -H 'Connection: keep-alive' -H 'Cookie: lang=fr; PHPSESSID=9csugaomqu52rqc6vgul600b91; auth=7d298d27f7ede0df78c9292cdca2cd57'  > "$shstatsfile_curl"
