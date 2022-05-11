@@ -22,7 +22,7 @@
 
 ### Start of script variables ###
 readonly SCRIPT_NAME="arrismon"
-readonly SCRIPT_VERSION="v0.3.37-beta"
+readonly SCRIPT_VERSION="v0.3.38-beta"
 SCRIPT_BRANCH="Credentials"
 SCRIPT_REPO="https://raw.githubusercontent.com/WRKDBF-Guy/$SCRIPT_NAME/$SCRIPT_BRANCH"
 readonly SCRIPT_DIR="/jffs/addons/$SCRIPT_NAME.d"
@@ -958,6 +958,7 @@ Get_Modem_Stats(){
 	
 	if [ "$LOGINNAME" != "*NA" ]; then
 		Decrypt_Password
+		Print_Output true "1=$UNENCRYPTED_PWD and 2=$ENCRYPTED_PWD" "$PASS"
 		/usr/sbin/curl "http://192.168.100.1/goform/login" -H "Content-Type: application/x-www-form-urlencoded" --data "loginUsername=$LOGINNAME&loginPassword=$UNENCRYPTED_PWD"
 	fi
 	
