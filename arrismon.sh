@@ -22,7 +22,7 @@
 
 ### Start of script variables ###
 readonly SCRIPT_NAME="arrismon"
-readonly SCRIPT_VERSION="v0.3.38-beta"
+readonly SCRIPT_VERSION="v0.3.39-beta"
 SCRIPT_BRANCH="Credentials"
 SCRIPT_REPO="https://raw.githubusercontent.com/WRKDBF-Guy/$SCRIPT_NAME/$SCRIPT_BRANCH"
 readonly SCRIPT_DIR="/jffs/addons/$SCRIPT_NAME.d"
@@ -849,7 +849,9 @@ Encrypt_Password(){
 }
 
 Decrypt_Password(){
-	ENCRYPTED_PWD=$(grep "ENCRYPTED" "$SCRIPT_CONF" | cut -c11-54)
+	LEN='expr length "$(grep "ENCRYPTED" "$SCRIPT_CONF")"'
+	printf "\\nLength=$LEN"
+	ENCRYPTED_PWD=$(grep "ENCRYPTED" "$SCRIPT_CONF" | cut -c11-$LEN)
 	UNENCRYPTED_PWD=$(echo "$ENCRYPTED_PWD" | openssl enc -aes-256-cbc -md sha512 -a -d -pbkdf2 -iter 100000 -salt -pass pass:'RMerlin.iza.Wizard!')
 }
 
@@ -958,7 +960,6 @@ Get_Modem_Stats(){
 	
 	if [ "$LOGINNAME" != "*NA" ]; then
 		Decrypt_Password
-		Print_Output true "1=$UNENCRYPTED_PWD and 2=$ENCRYPTED_PWD" "$PASS"
 		/usr/sbin/curl "http://192.168.100.1/goform/login" -H "Content-Type: application/x-www-form-urlencoded" --data "loginUsername=$LOGINNAME&loginPassword=$UNENCRYPTED_PWD"
 	fi
 	
