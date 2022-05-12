@@ -22,7 +22,7 @@
 
 ### Start of script variables ###
 readonly SCRIPT_NAME="arrismon"
-readonly SCRIPT_VERSION="v0.3.44-beta"
+readonly SCRIPT_VERSION="v0.3.45-beta"
 SCRIPT_BRANCH="Credentials"
 SCRIPT_REPO="https://raw.githubusercontent.com/WRKDBF-Guy/$SCRIPT_NAME/$SCRIPT_BRANCH"
 readonly SCRIPT_DIR="/jffs/addons/$SCRIPT_NAME.d"
@@ -343,7 +343,7 @@ Conf_FromSettings(){
 				SETTINGNAME="$(echo "$line" | cut -f1 -d'=' | awk '{ print toupper($1) }')"
 				SETTINGNAMELEN=$(echo "$SETTINGNAME" | wc -c)
 				LINELEN=$(echo "$line" | wc -c)
-				SETTINGVALUE="$(echo "$line" | cut -c$(($SETTINGNAMELEN+2))-$(($LINELEN-1)))"
+				SETTINGVALUE="$(echo "$line" | cut -c$(($SETTINGNAMELEN+1))-$(($LINELEN-1)))"
 				sed -i "s~$SETTINGNAME=.*~$SETTINGNAME=$SETTINGVALUE~" "$SCRIPT_CONF"
 			done < "$TMPFILE"
 			grep 'arrismon_version' "$SETTINGSFILE" > "$TMPFILE"
