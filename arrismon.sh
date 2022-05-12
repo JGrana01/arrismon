@@ -22,7 +22,7 @@
 
 ### Start of script variables ###
 readonly SCRIPT_NAME="arrismon"
-readonly SCRIPT_VERSION="v0.3.41-beta"
+readonly SCRIPT_VERSION="v0.3.42-beta"
 SCRIPT_BRANCH="Credentials"
 SCRIPT_REPO="https://raw.githubusercontent.com/WRKDBF-Guy/$SCRIPT_NAME/$SCRIPT_BRANCH"
 readonly SCRIPT_DIR="/jffs/addons/$SCRIPT_NAME.d"
@@ -850,8 +850,8 @@ Encrypt_Password(){
 
 Decrypt_Password(){
 	STRINGVAR=$(grep "ENCRYPTED" "$SCRIPT_CONF")
-	printf "\\nLength=${#STRVAR}"
-	ENCRYPTED_PWD=$(grep "ENCRYPTED" "$SCRIPT_CONF" | cut -c11-${#STRVAR})
+	printf "\\nLength=${#STRINGVAR}"
+	ENCRYPTED_PWD=$(grep "ENCRYPTED" "$SCRIPT_CONF" | cut -c11-${#STRINGVAR})
 	UNENCRYPTED_PWD=$(echo "$ENCRYPTED_PWD" | openssl enc -aes-256-cbc -md sha512 -a -d -pbkdf2 -iter 100000 -salt -pass pass:'RMerlin.iza.Wizard!')
 }
 
