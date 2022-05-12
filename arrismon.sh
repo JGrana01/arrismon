@@ -850,7 +850,7 @@ Encrypt_Password(){
 
 Decrypt_Password(){
 	STRINGVAR=$(grep "ENCRYPTED" "$SCRIPT_CONF")
-	printf "\\nLength=${#STRINGVAR}"
+	printf "\\nLength=$(echo $STRINGVAR | wc -c)\\n"
 	ENCRYPTED_PWD=$(grep "ENCRYPTED" "$SCRIPT_CONF" | cut -c11-${#STRINGVAR})
 	UNENCRYPTED_PWD=$(echo "$ENCRYPTED_PWD" | openssl enc -aes-256-cbc -md sha512 -a -d -pbkdf2 -iter 100000 -salt -pass pass:'RMerlin.iza.Wizard!')
 }
