@@ -22,7 +22,7 @@
 
 ### Start of script variables ###
 readonly SCRIPT_NAME="arrismon"
-readonly SCRIPT_VERSION="v0.3.45-beta"
+readonly SCRIPT_VERSION="v0.3.46-beta"
 SCRIPT_BRANCH="Credentials"
 SCRIPT_REPO="https://raw.githubusercontent.com/WRKDBF-Guy/$SCRIPT_NAME/$SCRIPT_BRANCH"
 readonly SCRIPT_DIR="/jffs/addons/$SCRIPT_NAME.d"
@@ -344,6 +344,19 @@ Conf_FromSettings(){
 				SETTINGNAMELEN=$(echo "$SETTINGNAME" | wc -c)
 				LINELEN=$(echo "$line" | wc -c)
 				SETTINGVALUE="$(echo "$line" | cut -c$(($SETTINGNAMELEN+1))-$(($LINELEN-1)))"
+				case $SETTINGNAME in
+					LOGINNAME)
+						LOGINNAME=$SETTINGVALUE
+					;;
+					PASSWORD)
+						if [ "$LOGINNAME" != "*NA" ]; then
+							Encrypt_Password "$SETTINGVALUE"
+						else
+							sed -i 's_^ENCRYPTED.*$_ENCRYPTED="*NA"_' "$SCRIPT_CONF"
+						fi
+							SETTINGVALUE=""
+					;;
+				esac
 				sed -i "s~$SETTINGNAME=.*~$SETTINGNAME=$SETTINGVALUE~" "$SCRIPT_CONF"
 			done < "$TMPFILE"
 			grep 'arrismon_version' "$SETTINGSFILE" > "$TMPFILE"
@@ -418,7 +431,7 @@ Conf_Exists(){
 			echo "LOGINNAME=*NA" >> "$SCRIPT_CONF"
 		fi
 		if ! grep -q "PASSWORD" "$SCRIPT_CONF"; then
-			echo "PASSWORD=*NA" >> "$SCRIPT_CONF"
+			echo "PASSWORD=" >> "$SCRIPT_CONF"
 		fi
 		if ! grep -q "RESETERRORCT" "$SCRIPT_CONF"; then
 			echo "RESETERRORCT=Y" >> "$SCRIPT_CONF"
@@ -429,7 +442,7 @@ Conf_Exists(){
 
 		return 0
 	else
-		{ echo "OUTPUTDATAMODE=average"; echo "OUTPUTTIMEMODE=unix"; echo "STORAGELOCATION=jffs"; echo "SHOWNOTICE=false"; echo "DAYSTOKEEP=30"; echo "LOGINNAME=*NA"; echo "PASSWORD=*NA"; echo "RESETERRORCT=Y"; echo "ENCRYPTED=*NA"; } > "$SCRIPT_CONF"                                                                         
+		{ echo "OUTPUTDATAMODE=average"; echo "OUTPUTTIMEMODE=unix"; echo "STORAGELOCATION=jffs"; echo "SHOWNOTICE=false"; echo "DAYSTOKEEP=30"; echo "LOGINNAME=*NA"; echo "PASSWORD="; echo "RESETERRORCT=Y"; echo "ENCRYPTED=*NA"; } > "$SCRIPT_CONF"                                                                         
 
 		return 1
 	fi
@@ -825,8 +838,7 @@ Credentials(){
 			if [ "$exitmenu" != "exit" ]; then
 				sed -i 's/^LOGINNAME.*$/LOGINNAME='"$LOGINNAME"'/' "$SCRIPT_CONF"
 				if [ "$LOGINNAME" != "*NA" ]; then
-					Encrypt_Password
-					sed -i 's_^ENCRYPTED.*$_ENCRYPTED='"$ENCRYPTED_PWD"'_' "$SCRIPT_CONF"
+					Encrypt_Password "$UNENCRYPTED_PWD"
 				else
 					sed -i 's_^ENCRYPTED.*$_ENCRYPTED="*NA"_' "$SCRIPT_CONF"
 				fi
@@ -847,7 +859,8 @@ Credentials(){
 }
 
 Encrypt_Password(){
-	ENCRYPTED_PWD=$(echo "$UNENCRYPTED_PWD" | openssl enc -aes-256-cbc -md sha512 -a -pbkdf2 -iter 100000 -salt -pass pass:'RMerlin.iza.Wizard!')
+	ENCRYPTED_PWD=$(echo "$1" | openssl enc -aes-256-cbc -md sha512 -a -pbkdf2 -iter 100000 -salt -pass pass:'RMerlin.iza.Wizard!')
+	sed -i 's_^ENCRYPTED.*$_ENCRYPTED='"$ENCRYPTED_PWD"'_' "$SCRIPT_CONF"
 }
 
 Decrypt_Password(){
