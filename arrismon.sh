@@ -346,6 +346,9 @@ Conf_FromSettings(){
 				SETTINGVALUE="$(echo "$line" | cut -c$(($SETTINGNAMELEN+1))-$(($LINELEN-1)))"
 				case $SETTINGNAME in
 					LOGINNAME)
+					if [ "$SETTINGVALUE" = "*na" ]; then
+						SETTINGVALUE="*NA"
+					fi
 						LOGINNAME=$SETTINGVALUE
 					;;
 					PASSWORD)
@@ -809,6 +812,9 @@ Credentials(){
 				if [ "$LOGINNAME_INP" = "e" ]; then
 					exitmenu="exit"
 					break
+				fi
+				if [ "$LOGINNAME_INP" = "*na" ]; then
+					LOGINNAME_INP="*NA"
 				fi
 				
 				LOGINNAME="$LOGINNAME_INP"
