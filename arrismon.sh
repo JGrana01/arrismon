@@ -22,7 +22,7 @@
 
 ### Start of script variables ###
 readonly SCRIPT_NAME="arrismon"
-readonly SCRIPT_VERSION="v0.3.47-beta"
+readonly SCRIPT_VERSION="v0.3.48-beta"
 SCRIPT_BRANCH="Credentials"
 SCRIPT_REPO="https://raw.githubusercontent.com/WRKDBF-Guy/$SCRIPT_NAME/$SCRIPT_BRANCH"
 readonly SCRIPT_DIR="/jffs/addons/$SCRIPT_NAME.d"
@@ -981,7 +981,8 @@ Get_Modem_Stats(){
 	
 	if [ "$LOGINNAME" != "*NA" ]; then
 		Decrypt_Password
-		/usr/sbin/curl "http://192.168.100.1/goform/login" -H "Content-Type: application/x-www-form-urlencoded" --data "loginUsername=$LOGINNAME&loginPassword=$UNENCRYPTED_PWD"
+		rm -f "/tmp/checkcreds.txt" 2>/dev/null
+		/usr/sbin/curl "http://192.168.100.1/goform/login" -H "Content-Type: application/x-www-form-urlencoded" --data "loginUsername=$LOGINNAME&loginPassword=$UNENCRYPTED_PWD" 2> /tmp/checkcreds.txt
 	fi
 	
 	/usr/sbin/curl -fs --retry 3 --connect-timeout 20 'http://192.168.100.1/RgConnect.asp' -H 'User-Agent: Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:98.0) Gecko/20100101 Firefox/98.0' -H 'Accept: */*' -H 'X-CSRF-TOKEN: 7d298d27f7ede0df78c9292cdca2cd57' -H 'X-Requested-With: XMLHttpRequest' -H 'Connection: keep-alive' -H 'Cookie: lang=fr; PHPSESSID=9csugaomqu52rqc6vgul600b91; auth=7d298d27f7ede0df78c9292cdca2cd57'  > "$shstatsfile_curl"
