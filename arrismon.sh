@@ -22,7 +22,7 @@
 
 ### Start of script variables ###
 readonly SCRIPT_NAME="arrismon"
-readonly SCRIPT_VERSION="v0.3.49-beta"
+readonly SCRIPT_VERSION="v0.3.50-beta"
 SCRIPT_BRANCH="Credentials"
 SCRIPT_REPO="https://raw.githubusercontent.com/WRKDBF-Guy/$SCRIPT_NAME/$SCRIPT_BRANCH"
 readonly SCRIPT_DIR="/jffs/addons/$SCRIPT_NAME.d"
@@ -353,7 +353,9 @@ Conf_FromSettings(){
 					;;
 					PASSWORD)
 						if [ "$LOGINNAME" != "*NA" ]; then
-							Encrypt_Password "$SETTINGVALUE"
+							if [ "$SETTINGVALUE" != "" ]; then
+								Encrypt_Password "$SETTINGVALUE"
+							fi
 						else
 							sed -i 's_^ENCRYPTED.*$_ENCRYPTED=*NA_' "$SCRIPT_CONF"
 						fi
